@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useState } from "react";
-import { Alert, Code, Container, Table } from "@mantine/core";
+import { Alert, Code, Container, Table, HoverCard } from "@mantine/core";
 import { Textarea, Text } from "@mantine/core";
 import { Kbd } from "@mantine/core";
 import { useDocumentTitle, useLocalStorage } from "@mantine/hooks";
@@ -168,7 +168,7 @@ function Rows({ data }: { data: object[] }) {
   const keys = Object.keys(first);
   const prefix = keys.join("");
   return (
-    <Table>
+    <Table highlightOnHover withTableBorder>
       <Table.Thead>
         <Table.Tr>
           {keys.map((key) => (
@@ -198,13 +198,34 @@ function Rows({ data }: { data: object[] }) {
 
 function Value({ value, column }: { value: any; column: string }) {
   if (value === null) {
-    return <Code>null</Code>;
+    return "null";
   }
-  if (typeof value === "object") {
-    return <Code>{JSON.stringify(value)}</Code>;
+  if (
+    ["data", "meta"].includes(column) &&
+    typeof value === "string" &&
+    value.startsWith("{") &&
+    value.endsWith("}")
+  ) {
+    const asString = value;
+    if (asString.length > 50) {
+      console.log({ strinified: JSON.stringify(JSON.parse(value), null, 2) });
+
+      return (
+        <HoverCard width={680} shadow="md">
+          <HoverCard.Target>
+            <Text span>{asString}...</Text>
+          </HoverCard.Target>
+          <HoverCard.Dropdown>
+            <Code block>{JSON.stringify(JSON.parse(value), null, 2)}</Code>
+          </HoverCard.Dropdown>
+        </HoverCard>
+      );
+    }
+
+    return asString;
   }
   if (typeof value === "number" && Number.isInteger(value)) {
-    return <Code>{value.toLocaleString()}</Code>;
+    return value.toLocaleString();
   }
-  return <Code>{value}</Code>;
+  return value.toString();
 }
