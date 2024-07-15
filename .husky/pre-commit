@@ -1,2 +1,2 @@
-npm run prettyfix
-npm run lintfix
+npm run pretty:fix
+npm run lint:fix
