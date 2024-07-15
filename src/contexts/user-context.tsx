@@ -81,7 +81,7 @@ export function UserDataProvider(props: { children: ReactNode }) {
       return {
         user,
       };
-    }
+    },
   );
 
   useEffect(() => {

@@ -11,7 +11,7 @@ start: build
     npm run start
 
 pretty:
-    prettier --check app *.js
+    npm run pretty
 
 tsc:
     npm run tsc

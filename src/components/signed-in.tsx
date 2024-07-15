@@ -1,9 +1,6 @@
-import { Alert, Button, Container, LoadingOverlay } from "@mantine/core";
+import { Alert, Button, LoadingOverlay } from "@mantine/core";
 import type { ReactNode } from "react";
 
-// import { useLocation } from "wouter"
-// import { useRouter } from "next/router"
-// import { useEffect } from "react"
 import { useUserData } from "../contexts/user-context";
 import { Authenticate } from "./authenticate";
 
