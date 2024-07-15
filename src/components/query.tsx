@@ -11,8 +11,12 @@ type QueryMetaResult = {
   count_rows: number;
   maxed_rows: boolean;
 };
+type QueryResultRowValue = string | null | number;
+type QueryResultRow = {
+  [key: string]: QueryResultRowValue;
+};
 type QueryResult = {
-  rows: any[];
+  rows: QueryResultRow[];
   meta: QueryMetaResult;
   error: string | null;
 };
@@ -35,7 +39,10 @@ export function Query() {
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
       if (event.key === "Enter" && event.metaKey) {
-        formSubmit();
+        if (textareaRef.current) {
+          setActiveQuery(extractActiveQuery(typedQuery, textareaRef.current));
+          setValue(typedQuery);
+        }
       }
     };
     if (textareaElement) textareaElement.addEventListener("keydown", listener);
@@ -44,7 +51,7 @@ export function Query() {
       if (textareaElement)
         textareaElement.removeEventListener("keydown", listener);
     };
-  }, [textareaElement, formSubmit]);
+  }, [textareaElement]);
 
   useEffect(() => {
     if (textareaRef.current && value) {
@@ -80,12 +87,7 @@ export function Query() {
   }
   useDocumentTitle(title);
 
-  function formSubmit() {
-    if (textareaRef.current) {
-      setActiveQuery(extractActiveQuery(typedQuery, textareaRef.current));
-      setValue(typedQuery);
-    }
-  }
+  // function formSubmit() {}
 
   return (
     <div>
@@ -160,7 +162,7 @@ function Took({ seconds }: { seconds: number }) {
   return <span>{seconds.toFixed(2)} seconds</span>;
 }
 
-function Rows({ data }: { data: object[] }) {
+function Rows({ data }: { data: QueryResultRow[] }) {
   if (data.length === 0) {
     return <Text>No rows to show.</Text>;
   }
@@ -180,7 +182,7 @@ function Rows({ data }: { data: object[] }) {
         {data.map((row, i) => (
           <Table.Tr key={prefix + i}>
             {keys.map((key, j) => {
-              const value = (row as any)[key];
+              const value = row[key];
               return (
                 <Table.Td key={key + j}>
                   <Text size="xs">
@@ -196,7 +198,13 @@ function Rows({ data }: { data: object[] }) {
   );
 }
 
-function Value({ value, column }: { value: any; column: string }) {
+function Value({
+  value,
+  column,
+}: {
+  value: QueryResultRowValue;
+  column: string;
+}) {
   if (value === null) {
     return "null";
   }
@@ -208,8 +216,6 @@ function Value({ value, column }: { value: any; column: string }) {
   ) {
     const asString = value;
     if (asString.length > 50) {
-      console.log({ strinified: JSON.stringify(JSON.parse(value), null, 2) });
-
       return (
         <HoverCard width={680} shadow="md">
           <HoverCard.Target>

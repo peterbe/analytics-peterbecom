@@ -1,5 +1,5 @@
-import { createTheme } from "@mantine/core"
-import { useLocalStorage } from "@mantine/hooks"
+import { createTheme } from "@mantine/core";
+import { useLocalStorage } from "@mantine/hooks";
 
 export function useMyTheme() {
   // Can't use usePreference() here because this hook is used before the
@@ -8,7 +8,7 @@ export function useMyTheme() {
     key: "hem:primary-color",
     // defaultValue: theme.primaryColor,
     defaultValue: "indigo",
-  })
+  });
 
   // hook will return either 'dark' or 'light' on client
   // and always 'light' during ssr as window.matchMedia is not available
@@ -36,7 +36,7 @@ export function useMyTheme() {
     // fontFamilyMonospace: "Monaco, Courier, monospace",
     fontFamilyMonospace:
       "Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace",
-  })
+  });
 
   return {
     myTheme,
@@ -45,5 +45,5 @@ export function useMyTheme() {
     // toggleColorScheme,
     primaryColor,
     setPrimaryColor,
-  }
+  };
 }
