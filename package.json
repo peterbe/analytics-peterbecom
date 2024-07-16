@@ -9,8 +9,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
     "preview": "vite preview",
-    "pretty": "prettier --check src",
-    "pretty:fix": "prettier --write src",
+    "pretty": "prettier --check src *.cjs package.json",
+    "pretty:fix": "prettier --write src *.cjs package.json",
     "prepare": "husky"
   },
   "dependencies": {
@@ -32,6 +32,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "eslint-plugin-simple-import-sort": "12.1.1",
     "husky": "9.0.11",
     "postcss": "8.4.39",
     "postcss-preset-mantine": "1.15.0",
