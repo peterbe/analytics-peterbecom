@@ -21,10 +21,10 @@ lint: pretty
     npm run tsc
 
 lintfix:
-    npm run lintfix
+    npm run lint:fix
 
 prettyfix:
-    npm run prettyfix
+    npm run pretty:fix
 
 test:
     npm run test
