@@ -1,5 +1,6 @@
 import { Alert, Container, Paper } from "@mantine/core";
 import { useDocumentTitle } from "@mantine/hooks";
+import { useLocation } from "wouter";
 
 import { useUserData } from "../contexts/user-context";
 
@@ -21,9 +22,11 @@ export function Authenticate() {
 }
 
 function SignIn() {
+  const [next] = useLocation();
+  const sp = new URLSearchParams({ next });
   return (
     <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-      SIGN IN
+      <a href={`/oidc/authenticate/?${sp}`}>Sign in with OpenID Connect</a>
     </Paper>
   );
 }
