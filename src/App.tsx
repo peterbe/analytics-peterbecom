@@ -1,17 +1,12 @@
 // All packages except `@mantine/hooks` require styles imports
 import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import "@mantine/notifications/styles.css";
-// import "@mantine/charts/styles.css";
 import "./styles/globals.css";
 
 import { MantineProvider } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
-// import type { ReactNode } from "react";
 import { Container, Text } from "@mantine/core";
+
 // import { useDisclosure } from "@mantine/hooks";
 // import { MantineLogo } from "@mantinex/mantine-logo";
-
 // import { FooterSimple } from "./components/foot";
 // import { HeaderTabs } from "./components/head";
 // import ScrollToTop from "./components/scroll-to-top";
@@ -23,7 +18,7 @@ export default function App() {
   // const { myTheme } = useMyTheme();
   return (
     <MantineProvider defaultColorScheme={"light"}>
-      <Notifications />
+      {/* <Notifications /> */}
       <UserDataProvider>
         <BasicAppShell />
         {/* <ScrollToTop /> */}

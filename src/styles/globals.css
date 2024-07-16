@@ -41,5 +41,11 @@ textarea {
 td,
 th {
   font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+}
+td {
   font-size: 0.9em;
+}
+
+th {
+  font-size: 1.1em;
 }

@@ -1,9 +1,9 @@
-import { useEffect, useRef } from "react";
-import { useState } from "react";
-import { Alert, Code, Container, Table, HoverCard } from "@mantine/core";
-import { Textarea, Text } from "@mantine/core";
+import { Alert, Code, Container, HoverCard, Paper, Table } from "@mantine/core";
+import { Text, Textarea } from "@mantine/core";
 import { Kbd } from "@mantine/core";
 import { useDocumentTitle, useLocalStorage } from "@mantine/hooks";
+import { memo, useEffect, useRef } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 
 type QueryMetaResult = {
@@ -23,10 +23,14 @@ type QueryResult = {
 
 export function Query() {
   const [value, setValue] = useLocalStorage({
-    key: "saved-query",
+    key: "saved-queries",
     defaultValue: "",
   });
-  const [activeQuery, setActiveQuery] = useState("");
+  const [activeQuery, setActiveQuery] = useLocalStorage({
+    key: "active-query",
+    defaultValue: "",
+  });
+
   const [typedQuery, setTypedQuery] = useState(value);
   useEffect(() => {
     if (value && !typedQuery) {
@@ -39,8 +43,20 @@ export function Query() {
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
       if (event.key === "Enter" && event.metaKey) {
+        if (!typedQuery.trim()) {
+          console.warn("No typed query yet");
+
+          return;
+        }
         if (textareaRef.current) {
-          setActiveQuery(extractActiveQuery(typedQuery, textareaRef.current));
+          const extracted = extractActiveQuery(typedQuery, textareaRef.current);
+          if (extracted.length <= 1) {
+            console.log({ typedQuery, extracted });
+            throw new Error("Extracting query from position failed");
+          }
+          // console.log({ extracted });
+
+          setActiveQuery(extracted);
           setValue(typedQuery);
         }
       }
@@ -51,13 +67,13 @@ export function Query() {
       if (textareaElement)
         textareaElement.removeEventListener("keydown", listener);
     };
-  }, [textareaElement]);
+  }, [textareaElement, typedQuery]);
 
-  useEffect(() => {
-    if (textareaRef.current && value) {
-      setActiveQuery(extractActiveQuery(value, textareaRef.current));
-    }
-  }, [textareaRef, value]);
+  // useEffect(() => {
+  //   if (textareaRef.current && value) {
+  //     setActiveQuery(extractActiveQuery(value, textareaRef.current));
+  //   }
+  // }, [textareaRef, value]);
 
   let xhrUrl = null;
   if (activeQuery.trim()) {
@@ -71,10 +87,16 @@ export function Query() {
     async (url: string) => {
       const response = await fetch(url);
       if (!response.ok) {
+        if (response.status === 400) {
+          const json = await response.json();
+          if (json.error) {
+            throw new Error(json.error);
+          }
+        }
         throw new Error(`${response.status} on ${response.url}`);
       }
       return response.json();
-    },
+    }
   );
 
   let title = "Query";
@@ -111,14 +133,25 @@ export function Query() {
       />
       <Container mb={20}>
         <Text size="sm" ta="right">
-          <b>Tip!</b> Use <Kbd>⌘</Kbd>-<Kbd>Enter</Kbd> to run the query when
-          focus is inside textarea
+          Use <Kbd>⌘</Kbd>-<Kbd>Enter</Kbd> to run the query when focus is
+          inside textarea
         </Text>
       </Container>
+
       {isLoading && <Alert color="gray">Loading...</Alert>}
-      {error && <Alert color="red">{error.message}</Alert>}
+      {error && (
+        <Alert color={error.message.includes("500") ? "red" : "yellow"}>
+          <pre style={{ margin: 0 }}>{error.message}</pre>
+        </Alert>
+      )}
 
       {data && <Show data={data} />}
+
+      {activeQuery && (
+        <Paper>
+          Active query: <Code>{activeQuery}</Code>
+        </Paper>
+      )}
     </div>
   );
 }
@@ -143,17 +176,24 @@ function extractActiveQuery(typedQuery: string, textarea: HTMLTextAreaElement) {
   return typedQuery.substring(a, b);
 }
 
-function Show({ data }: { data: QueryResult }) {
+const Show = memo(function Show({ data }: { data: QueryResult }) {
   return (
     <div>
-      <Text size="xs">
+      <Text size="sm">
         Rows: {data.meta.count_rows.toLocaleString()}. Took{" "}
         <Took seconds={data.meta.took_seconds} />
+        {data.meta.maxed_rows && (
+          <span>
+            {" "}
+            (maxed rows, only showing first{" "}
+            {data.meta.count_rows.toLocaleString()})
+          </span>
+        )}
       </Text>
       <Rows data={data.rows} />
     </div>
   );
-}
+});
 
 function Took({ seconds }: { seconds: number }) {
   if (seconds < 1) {
@@ -173,6 +213,7 @@ function Rows({ data }: { data: QueryResultRow[] }) {
     <Table highlightOnHover withTableBorder>
       <Table.Thead>
         <Table.Tr>
+          <Table.Th></Table.Th>
           {keys.map((key) => (
             <Table.Th key={key}>{key}</Table.Th>
           ))}
@@ -180,7 +221,10 @@ function Rows({ data }: { data: QueryResultRow[] }) {
       </Table.Thead>
       <Table.Tbody>
         {data.map((row, i) => (
-          <Table.Tr key={prefix + i}>
+          <Table.Tr key={prefix + i} id={`r${i + 1}`}>
+            <Table.Td>
+              <a href={`#r${i + 1}`}>{i + 1}</a>
+            </Table.Td>
             {keys.map((key, j) => {
               const value = row[key];
               return (
@@ -230,7 +274,7 @@ function Value({
 
     return asString;
   }
-  if (typeof value === "number" && Number.isInteger(value)) {
+  if (typeof value === "number" && Number.isInteger(value) && column !== "id") {
     return value.toLocaleString();
   }
   return value.toString();
