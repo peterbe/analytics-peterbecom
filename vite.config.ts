@@ -13,6 +13,13 @@ export default defineConfig({
         secure: false,
         ws: true,
       },
+      "/oidc": {
+        // target: "http://127.0.0.1:8000",
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
     },
   },
 });
