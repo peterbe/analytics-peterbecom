@@ -96,7 +96,7 @@ export function Query() {
         throw new Error(`${response.status} on ${response.url}`);
       }
       return response.json();
-    }
+    },
   );
 
   let title = "Query";
