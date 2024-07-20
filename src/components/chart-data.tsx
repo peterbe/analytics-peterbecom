@@ -39,7 +39,7 @@ export function ChartData({
               onClick={() => {
                 searchParams.set(
                   `${name}:orientation`,
-                  orientation === "horizontal" ? "vertical" : "horizontal"
+                  orientation === "horizontal" ? "vertical" : "horizontal",
                 );
                 navigate(`?${searchParams.toString()}`);
               }}
