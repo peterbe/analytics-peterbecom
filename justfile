@@ -8,7 +8,7 @@ build:
     npm run build
 
 start: build
-    npm run start
+    npm run preview
 
 pretty:
     npm run pretty

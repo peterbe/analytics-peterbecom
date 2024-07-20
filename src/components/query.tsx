@@ -1,25 +1,26 @@
-import { Alert, Code, Container, HoverCard, Paper, Table } from "@mantine/core";
-import { Text, Textarea } from "@mantine/core";
-import { Kbd } from "@mantine/core";
+import {
+  Alert,
+  Code,
+  Container,
+  HoverCard,
+  Kbd,
+  Paper,
+  Table,
+  Text,
+  Textarea,
+} from "@mantine/core";
 import { useDocumentTitle, useLocalStorage } from "@mantine/hooks";
 import { memo, useEffect, useRef } from "react";
 import { useState } from "react";
 import useSWR from "swr";
+import { Link, useSearch } from "wouter";
 
-type QueryMetaResult = {
-  took_seconds: number;
-  count_rows: number;
-  maxed_rows: boolean;
-};
-type QueryResultRowValue = string | null | number;
-type QueryResultRow = {
-  [key: string]: QueryResultRowValue;
-};
-type QueryResult = {
-  rows: QueryResultRow[];
-  meta: QueryMetaResult;
-  error: string | null;
-};
+import type {
+  QueryResult,
+  QueryResultRow,
+  QueryResultRowValue,
+} from "../types";
+import { ChartData } from "./chart-data";
 
 export function Query() {
   const [value, setValue] = useLocalStorage({
@@ -54,7 +55,6 @@ export function Query() {
             console.log({ typedQuery, extracted });
             throw new Error("Extracting query from position failed");
           }
-          // console.log({ extracted });
 
           setActiveQuery(extracted);
           setValue(typedQuery);
@@ -67,13 +67,7 @@ export function Query() {
       if (textareaElement)
         textareaElement.removeEventListener("keydown", listener);
     };
-  }, [textareaElement, typedQuery]);
-
-  // useEffect(() => {
-  //   if (textareaRef.current && value) {
-  //     setActiveQuery(extractActiveQuery(value, textareaRef.current));
-  //   }
-  // }, [textareaRef, value]);
+  }, [textareaElement, typedQuery, setActiveQuery, setValue]);
 
   let xhrUrl = null;
   if (activeQuery.trim()) {
@@ -176,9 +170,18 @@ function extractActiveQuery(typedQuery: string, textarea: HTMLTextAreaElement) {
   return typedQuery.substring(a, b);
 }
 
-const Show = memo(function Show({ data }: { data: QueryResult }) {
+function Show({ data }: { data: QueryResult }) {
+  const search = useSearch();
+  const searchParams = new URLSearchParams(search);
+
+  const chart = searchParams.get("chart");
   return (
     <div>
+      {chart && ["bar", "line", "pie"].includes(chart) && (
+        <Container fluid m={40}>
+          <ChartData name="main" data={data} chart={chart} />
+        </Container>
+      )}
       <Text size="sm">
         Rows: {data.meta.count_rows.toLocaleString()}. Took{" "}
         <Took seconds={data.meta.took_seconds} />
@@ -190,10 +193,11 @@ const Show = memo(function Show({ data }: { data: QueryResult }) {
           </span>
         )}
       </Text>
+
       <Rows data={data.rows} />
     </div>
   );
-});
+}
 
 function Took({ seconds }: { seconds: number }) {
   if (seconds < 1) {
@@ -202,45 +206,78 @@ function Took({ seconds }: { seconds: number }) {
   return <span>{seconds.toFixed(2)} seconds</span>;
 }
 
-function Rows({ data }: { data: QueryResultRow[] }) {
+const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
   if (data.length === 0) {
     return <Text>No rows to show.</Text>;
   }
+
   const first = data[0];
   const keys = Object.keys(first);
   const prefix = keys.join("");
+
+  let chartable = false;
+  let firstIsString: null | boolean = null;
+  for (const key of keys) {
+    if (firstIsString === null) {
+      firstIsString = typeof first[key] === "string";
+    } else if (firstIsString) {
+      if (typeof first[key] === "number") {
+        chartable = true;
+        break;
+      }
+    }
+  }
+
   return (
-    <Table highlightOnHover withTableBorder>
-      <Table.Thead>
-        <Table.Tr>
-          <Table.Th></Table.Th>
-          {keys.map((key) => (
-            <Table.Th key={key}>{key}</Table.Th>
-          ))}
-        </Table.Tr>
-      </Table.Thead>
-      <Table.Tbody>
-        {data.map((row, i) => (
-          <Table.Tr key={prefix + i} id={`r${i + 1}`}>
-            <Table.Td>
-              <a href={`#r${i + 1}`}>{i + 1}</a>
-            </Table.Td>
-            {keys.map((key, j) => {
-              const value = row[key];
-              return (
-                <Table.Td key={key + j}>
-                  <Text size="xs">
-                    <Value value={value} column={key} />
-                  </Text>
-                </Table.Td>
-              );
-            })}
+    <div>
+      {chartable && (
+        <div>
+          Turn into{" "}
+          <Link href={`?${new URLSearchParams({ chart: "bar" })}`}>
+            bar chart
+          </Link>
+          ,{" "}
+          <Link href={`?${new URLSearchParams({ chart: "line" })}`}>
+            line chart
+          </Link>
+          ,{" "}
+          <Link href={`?${new URLSearchParams({ chart: "pie" })}`}>
+            pie chart
+          </Link>
+        </div>
+      )}
+      <Table highlightOnHover withTableBorder>
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th></Table.Th>
+            {keys.map((key) => (
+              <Table.Th key={key}>{key}</Table.Th>
+            ))}
           </Table.Tr>
-        ))}
-      </Table.Tbody>
-    </Table>
+        </Table.Thead>
+        <Table.Tbody>
+          {data.map((row, i) => (
+            <Table.Tr key={prefix + i} id={`r${i + 1}`}>
+              <Table.Td>
+                <a href={`#r${i + 1}`}>{i + 1}</a>
+              </Table.Td>
+              {keys.map((key, j) => {
+                const value = row[key];
+                return (
+                  <Table.Td key={key + j}>
+                    <Text size="xs">
+                      <Value value={value} column={key} />
+                    </Text>
+                  </Table.Td>
+                );
+              })}
+            </Table.Tr>
+          ))}
+        </Table.Tbody>
+      </Table>
+    </div>
   );
-}
+});
 
 function Value({
   value,
