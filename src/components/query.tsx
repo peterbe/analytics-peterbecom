@@ -13,7 +13,7 @@ import { useDocumentTitle, useLocalStorage } from "@mantine/hooks";
 import { memo, useEffect, useRef } from "react";
 import { useState } from "react";
 import useSWR from "swr";
-import { Link, useSearch } from "wouter";
+import { Link, useLocation, useSearch } from "wouter";
 
 import type {
   QueryResult,
@@ -172,13 +172,27 @@ function extractActiveQuery(typedQuery: string, textarea: HTMLTextAreaElement) {
 
 function Show({ data }: { data: QueryResult }) {
   const search = useSearch();
+  const [location] = useLocation();
   const searchParams = new URLSearchParams(search);
+  const newChartSearchParams = new URLSearchParams(searchParams);
+  newChartSearchParams.delete("chart");
 
   const chart = searchParams.get("chart");
   return (
     <div>
       {chart && ["bar", "line", "pie"].includes(chart) && (
         <Container fluid m={40}>
+          <p>
+            <Link
+              href={
+                newChartSearchParams.toString()
+                  ? `?${newChartSearchParams}`
+                  : location
+              }
+            >
+              Close chart
+            </Link>
+          </p>
           <ChartData name="main" data={data} chart={chart} />
         </Container>
       )}
