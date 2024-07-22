@@ -1,29 +1,29 @@
-import { LineChart } from "@mantine/charts";
+import { LineChart } from "@mantine/charts"
+import { useLocalStorage } from "@mantine/hooks"
 import {
   Box,
   LoadingOverlay,
   SegmentedControl,
   Text,
   Title,
-} from "@mantine/core";
-import { useState } from "react";
-import useSWR from "swr";
+} from "@mantine/core"
+import useSWR from "swr"
 
-import type { QueryResult } from "../../types";
-import { ChartContainer } from "./container";
+import type { QueryResult } from "../../types"
+import { ChartContainer } from "./container"
 
 async function fetcher(url: string) {
-  const response = await fetch(url);
+  const response = await fetch(url)
   if (!response.ok) {
     if (response.status === 400) {
-      const json = await response.json();
+      const json = await response.json()
       if (json.error) {
-        throw new Error(json.error);
+        throw new Error(json.error)
       }
     }
-    throw new Error(`${response.status} on ${response.url}`);
+    throw new Error(`${response.status} on ${response.url}`)
   }
-  return response.json();
+  return response.json()
 }
 
 const sqlQuery = (days = 7) => `
@@ -39,7 +39,7 @@ GROUP BY
     day
 ORDER BY
     day;
-`;
+`
 const sqlQueryPrevious = (days = 7) => `
 SELECT
     DATE_TRUNC('day', created) AS day,
@@ -54,76 +54,79 @@ GROUP BY
     day
 ORDER BY
     day;
-`;
+`
 export function Pageviews() {
-  const [intervalDays, setIntervalDays] = useState("7");
-  const xhrPrefix = "/api/v0/analytics/query?";
+  const [intervalDays, setIntervalDays] = useLocalStorage({
+    key: "analytics:pageviews:interval",
+    defaultValue: "7",
+  })
+  const xhrPrefix = "/api/v0/analytics/query?"
 
   const fetchOptions = {
     revalidateOnFocus: false,
     refreshInterval: 5 * 60 * 1000,
-  };
+  }
 
   const { data, error, isLoading } = useSWR<QueryResult, Error>(
     `${xhrPrefix}${new URLSearchParams({ query: sqlQuery(Number(intervalDays)) })}`,
     fetcher,
     fetchOptions,
-  );
+  )
 
   const previous = useSWR<QueryResult, Error>(
     `${xhrPrefix}${new URLSearchParams({ query: sqlQueryPrevious(Number(intervalDays)) })}`,
     fetcher,
     fetchOptions,
-  );
+  )
 
   type DataRow = {
-    date: string;
-    count?: number;
-    countPrevious?: number;
-  };
+    date: string
+    count?: number
+    countPrevious?: number
+  }
 
-  const dataX: DataRow[] = [];
+  const dataX: DataRow[] = []
   const series: {
-    name: string;
-    label: string;
-    strokeDasharray?: string;
-  }[] = [{ name: "count", label: "Number of pageviews" }];
-  const dataO: Record<string, number> = {};
-  const dataP: Record<string, number> = {};
-  const keys: string[] = [];
+    name: string
+    label: string
+    strokeDasharray?: string
+  }[] = [{ name: "count", label: "Number of pageviews" }]
+  const dataO: Record<string, number> = {}
+  const dataP: Record<string, number> = {}
+  const keys: string[] = []
   if (data) {
     for (const row of data.rows) {
-      const d = new Date(row.day as string);
-      const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`;
-      dataO[k] = row.count as number;
-      keys.push(k);
+      const d = new Date(row.day as string)
+      const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
+      dataO[k] = row.count as number
+      keys.push(k)
     }
   }
   if (previous.data) {
     for (const row of previous.data.rows) {
-      const d = addDays(new Date(row.day as string), Number(intervalDays));
-      const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`;
-      dataP[k] = row.count as number;
+      const d = addDays(new Date(row.day as string), Number(intervalDays))
+      const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
+      dataP[k] = row.count as number
     }
     series.push({
       name: "countPrevious",
       label: "Previous period",
       strokeDasharray: "5 5",
-    });
+    })
   }
   for (const k of keys) {
     const entry: {
-      date: string;
-      count: number;
-      countPrevious?: number;
+      date: string
+      count: number
+      countPrevious?: number
     } = {
       date: k,
       count: dataO[k],
-    };
-    if (k in dataP) {
-      entry.countPrevious = dataP[k];
     }
-    dataX.push(entry);
+    if (k in dataP) {
+      entry.countPrevious = dataP[k]
+    }
+    dataX.push(entry)
   }
 
   return (
@@ -174,10 +177,10 @@ export function Pageviews() {
         />
       </Box>
     </ChartContainer>
-  );
+  )
 }
 function addDays(date: Date, days: number) {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
+  const result = new Date(date)
+  result.setDate(result.getDate() + days)
+  return result
 }
