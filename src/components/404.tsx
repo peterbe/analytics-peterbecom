@@ -1,5 +1,5 @@
-import { Button, Container, Group, Text, Title } from "@mantine/core";
-import { Link } from "wouter";
+import { Button, Container, Group, Text, Title } from "@mantine/core"
+import { Link } from "wouter"
 
 // import classes from "../styles/NotFoundTitle.module.css"
 
@@ -19,5 +19,5 @@ export function Custom404() {
         </Link>
       </Group>
     </Container>
-  );
+  )
 }

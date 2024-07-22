@@ -1,22 +1,22 @@
 export interface User {
-  id: number;
-  username: string;
+  id: number
+  username: string
 }
 
 export type QueryMetaResult = {
-  took_seconds: number;
-  count_rows: number;
-  maxed_rows: boolean;
-};
+  took_seconds: number
+  count_rows: number
+  maxed_rows: boolean
+}
 
-export type QueryResultRowValue = string | null | number;
+export type QueryResultRowValue = string | null | number
 
 export type QueryResultRow = {
-  [key: string]: QueryResultRowValue;
-};
+  [key: string]: QueryResultRowValue
+}
 
 export type QueryResult = {
-  rows: QueryResultRow[];
-  meta: QueryMetaResult;
-  error: string | null;
-};
+  rows: QueryResultRow[]
+  meta: QueryMetaResult
+  error: string | null
+}

@@ -1,5 +1,4 @@
 import { LineChart } from "@mantine/charts"
-import { useLocalStorage } from "@mantine/hooks"
 import {
   Box,
   LoadingOverlay,
@@ -7,6 +6,7 @@ import {
   Text,
   Title,
 } from "@mantine/core"
+import { useLocalStorage } from "@mantine/hooks"
 import useSWR from "swr"
 
 import type { QueryResult } from "../../types"

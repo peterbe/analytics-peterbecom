@@ -8,100 +8,96 @@ import {
   Table,
   Text,
   Textarea,
-} from "@mantine/core";
-import { useDocumentTitle, useLocalStorage } from "@mantine/hooks";
-import { memo, useEffect, useRef } from "react";
-import { useState } from "react";
-import useSWR from "swr";
-import { Link, useLocation, useSearch } from "wouter";
+} from "@mantine/core"
+import { useDocumentTitle, useLocalStorage } from "@mantine/hooks"
+import { memo, useEffect, useRef } from "react"
+import { useState } from "react"
+import useSWR from "swr"
+import { Link, useLocation, useSearch } from "wouter"
 
-import type {
-  QueryResult,
-  QueryResultRow,
-  QueryResultRowValue,
-} from "../types";
-import { ChartData } from "./chart-data";
+import type { QueryResult, QueryResultRow, QueryResultRowValue } from "../types"
+import { ChartData } from "./chart-data"
 
 export function Query() {
   const [value, setValue] = useLocalStorage({
     key: "saved-queries",
     defaultValue: "",
-  });
+  })
   const [activeQuery, setActiveQuery] = useLocalStorage({
     key: "active-query",
     defaultValue: "",
-  });
+  })
 
-  const [typedQuery, setTypedQuery] = useState(value);
+  const [typedQuery, setTypedQuery] = useState(value)
   useEffect(() => {
     if (value && !typedQuery) {
-      setTypedQuery(value);
+      setTypedQuery(value)
     }
-  }, [value, typedQuery]);
+  }, [value, typedQuery])
 
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const textareaElement = textareaRef.current;
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+  const textareaElement = textareaRef.current
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
       if (event.key === "Enter" && event.metaKey) {
         if (!typedQuery.trim()) {
-          console.warn("No typed query yet");
+          console.warn("No typed query yet")
 
-          return;
+          return
         }
         if (textareaRef.current) {
-          const extracted = extractActiveQuery(typedQuery, textareaRef.current);
+          const extracted = extractActiveQuery(typedQuery, textareaRef.current)
           if (extracted.length <= 1) {
-            console.log({ typedQuery, extracted });
-            throw new Error("Extracting query from position failed");
+            console.log({ typedQuery, extracted })
+            throw new Error("Extracting query from position failed")
           }
 
-          setActiveQuery(extracted);
-          setValue(typedQuery);
+          setActiveQuery(extracted)
+          setValue(typedQuery)
         }
       }
-    };
-    if (textareaElement) textareaElement.addEventListener("keydown", listener);
+    }
+    if (textareaElement) textareaElement.addEventListener("keydown", listener)
 
     return () => {
       if (textareaElement)
-        textareaElement.removeEventListener("keydown", listener);
-    };
-  }, [textareaElement, typedQuery, setActiveQuery, setValue]);
+        textareaElement.removeEventListener("keydown", listener)
+    }
+  }, [textareaElement, typedQuery, setActiveQuery, setValue])
 
-  let xhrUrl = null;
+  let xhrUrl = null
   if (activeQuery.trim()) {
-    const sp = new URLSearchParams();
-    sp.set("query", activeQuery);
-    xhrUrl = "/api/v0/analytics/query?" + sp.toString();
+    const sp = new URLSearchParams()
+    sp.set("query", activeQuery)
+    xhrUrl = "/api/v0/analytics/query?" + sp.toString()
   }
 
   const { data, error, isLoading } = useSWR<QueryResult, Error>(
     xhrUrl,
     async (url: string) => {
-      const response = await fetch(url);
+      const response = await fetch(url)
       if (!response.ok) {
         if (response.status === 400) {
-          const json = await response.json();
+          const json = await response.json()
           if (json.error) {
-            throw new Error(json.error);
+            throw new Error(json.error)
           }
         }
-        throw new Error(`${response.status} on ${response.url}`);
+        throw new Error(`${response.status} on ${response.url}`)
       }
-      return response.json();
+      return response.json()
     },
-  );
+  )
 
-  let title = "Query";
+  let title = "Query"
   if (error) {
-    title = `Error in query`;
+    title = `Error in query`
   } else if (isLoading) {
-    title = "Loading query...";
+    title = "Loading query..."
   } else if (data) {
-    title = `${data.meta.count_rows.toLocaleString()} rows`;
+    title = `${data.meta.count_rows.toLocaleString()} rows`
   }
-  useDocumentTitle(title);
+  useDocumentTitle(title)
 
   // function formSubmit() {}
 
@@ -122,7 +118,7 @@ export function Query() {
         ref={textareaRef}
         value={typedQuery}
         onChange={(event) => {
-          setTypedQuery(event.target.value);
+          setTypedQuery(event.target.value)
         }}
         autoCorrect="off"
       />
@@ -148,37 +144,37 @@ export function Query() {
         </Paper>
       )}
     </div>
-  );
+  )
 }
 
 function extractActiveQuery(typedQuery: string, textarea: HTMLTextAreaElement) {
-  let a = textarea.selectionStart;
-  let b = textarea.selectionEnd;
+  let a = textarea.selectionStart
+  let b = textarea.selectionEnd
   while (a) {
-    const here = typedQuery.substring(a - 2, a);
+    const here = typedQuery.substring(a - 2, a)
     if (here === "\n\n") {
-      break;
+      break
     }
-    a--;
+    a--
   }
   while (b < typedQuery.length) {
-    const here = typedQuery.substring(b, b + 2);
+    const here = typedQuery.substring(b, b + 2)
     if (here === "\n\n") {
-      break;
+      break
     }
-    b++;
+    b++
   }
-  return typedQuery.substring(a, b);
+  return typedQuery.substring(a, b)
 }
 
 function Show({ data }: { data: QueryResult }) {
-  const search = useSearch();
-  const [location] = useLocation();
-  const searchParams = new URLSearchParams(search);
-  const newChartSearchParams = new URLSearchParams(searchParams);
-  newChartSearchParams.delete("chart");
+  const search = useSearch()
+  const [location] = useLocation()
+  const searchParams = new URLSearchParams(search)
+  const newChartSearchParams = new URLSearchParams(searchParams)
+  newChartSearchParams.delete("chart")
 
-  const chart = searchParams.get("chart");
+  const chart = searchParams.get("chart")
   return (
     <div>
       {chart && ["bar", "line", "pie"].includes(chart) && (
@@ -211,34 +207,34 @@ function Show({ data }: { data: QueryResult }) {
 
       <Rows data={data.rows} />
     </div>
-  );
+  )
 }
 
 function Took({ seconds }: { seconds: number }) {
   if (seconds < 1) {
-    return <span>{(seconds * 1000).toFixed(1)} milliseconds</span>;
+    return <span>{(seconds * 1000).toFixed(1)} milliseconds</span>
   }
-  return <span>{seconds.toFixed(2)} seconds</span>;
+  return <span>{seconds.toFixed(2)} seconds</span>
 }
 
 const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
   if (data.length === 0) {
-    return <Text>No rows to show.</Text>;
+    return <Text>No rows to show.</Text>
   }
 
-  const first = data[0];
-  const keys = Object.keys(first);
-  const prefix = keys.join("");
+  const first = data[0]
+  const keys = Object.keys(first)
+  const prefix = keys.join("")
 
-  let chartable = false;
-  let firstIsString: null | boolean = null;
+  let chartable = false
+  let firstIsString: null | boolean = null
   for (const key of keys) {
     if (firstIsString === null) {
-      firstIsString = typeof first[key] === "string";
+      firstIsString = typeof first[key] === "string"
     } else if (firstIsString) {
       if (typeof first[key] === "number") {
-        chartable = true;
-        break;
+        chartable = true
+        break
       }
     }
   }
@@ -277,32 +273,32 @@ const Rows = memo(function Rows({ data }: { data: QueryResultRow[] }) {
                 <a href={`#r${i + 1}`}>{i + 1}</a>
               </Table.Td>
               {keys.map((key, j) => {
-                const value = row[key];
+                const value = row[key]
                 return (
                   <Table.Td key={key + j}>
                     <Text size="xs">
                       <Value value={value} column={key} />
                     </Text>
                   </Table.Td>
-                );
+                )
               })}
             </Table.Tr>
           ))}
         </Table.Tbody>
       </Table>
     </div>
-  );
-});
+  )
+})
 
 function Value({
   value,
   column,
 }: {
-  value: QueryResultRowValue;
-  column: string;
+  value: QueryResultRowValue
+  column: string
 }) {
   if (value === null) {
-    return "null";
+    return "null"
   }
   if (
     ["data", "meta"].includes(column) &&
@@ -310,7 +306,7 @@ function Value({
     value.startsWith("{") &&
     value.endsWith("}")
   ) {
-    const asString = value;
+    const asString = value
     if (asString.length > 50) {
       return (
         <HoverCard width={680} shadow="md">
@@ -321,13 +317,13 @@ function Value({
             <Code block>{JSON.stringify(JSON.parse(value), null, 2)}</Code>
           </HoverCard.Dropdown>
         </HoverCard>
-      );
+      )
     }
 
-    return asString;
+    return asString
   }
   if (typeof value === "number" && Number.isInteger(value) && column !== "id") {
-    return value.toLocaleString();
+    return value.toLocaleString()
   }
-  return value.toString();
+  return value.toString()
 }

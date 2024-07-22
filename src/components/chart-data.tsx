@@ -1,28 +1,27 @@
-import { BarChart } from "@mantine/charts";
-import { Button, Code, Grid } from "@mantine/core";
-import { useLocation, useSearch } from "wouter";
+import { BarChart } from "@mantine/charts"
+import { Button, Code, Grid } from "@mantine/core"
+import { useLocation, useSearch } from "wouter"
 
-import type { QueryResult } from "../types";
+import type { QueryResult } from "../types"
 
 export function ChartData({
   name,
   data,
   chart,
 }: {
-  name: string;
-  data: QueryResult;
-  chart: string;
+  name: string
+  data: QueryResult
+  chart: string
 }) {
-  const [, navigate] = useLocation();
-  const search = useSearch();
-  const searchParams = new URLSearchParams(search);
-  const orientationRaw =
-    searchParams.get(`${name}:orientation`) || "horizontal";
+  const [, navigate] = useLocation()
+  const search = useSearch()
+  const searchParams = new URLSearchParams(search)
+  const orientationRaw = searchParams.get(`${name}:orientation`) || "horizontal"
   const orientation =
-    orientationRaw === "horizontal" ? "horizontal" : "vertical";
+    orientationRaw === "horizontal" ? "horizontal" : "vertical"
 
   if (chart === "bar") {
-    const { data: d, key, series } = makeData(data);
+    const { data: d, key, series } = makeData(data)
     return (
       <div>
         <BarChart
@@ -40,8 +39,8 @@ export function ChartData({
                 searchParams.set(
                   `${name}:orientation`,
                   orientation === "horizontal" ? "vertical" : "horizontal",
-                );
-                navigate(`?${searchParams.toString()}`);
+                )
+                navigate(`?${searchParams.toString()}`)
               }}
             >
               Toggle orientation
@@ -49,42 +48,42 @@ export function ChartData({
           </Grid.Col>
         </Grid>
       </div>
-    );
+    )
   }
   return (
     <div>
       Unknown chart type <Code>{chart}</Code>
     </div>
-  );
+  )
 }
 
-type DataType = Record<string, number | string>;
+type DataType = Record<string, number | string>
 type Serie = {
-  name: string;
-  color?: string;
-};
+  name: string
+  color?: string
+}
 function makeData(data: QueryResult) {
-  const d: DataType[] = [];
+  const d: DataType[] = []
 
-  let firstKey = "";
-  const series: Serie[] = [];
-  const colors: Record<string, string> = {};
+  let firstKey = ""
+  const series: Serie[] = []
+  const colors: Record<string, string> = {}
   for (const row of data.rows) {
     if (!firstKey) {
       for (const key of Object.keys(row)) {
         if (!firstKey) {
-          firstKey = key;
+          firstKey = key
         } else {
-          colors[key] = "blue.6";
+          colors[key] = "blue.6"
         }
       }
     }
-    d.push(row as DataType);
+    d.push(row as DataType)
   }
   for (const [name, color] of Object.entries(colors)) {
-    series.push({ name, color });
+    series.push({ name, color })
   }
 
-  const key = firstKey;
-  return { data: d, key, series };
+  const key = firstKey
+  return { data: d, key, series }
 }

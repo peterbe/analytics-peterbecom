@@ -1,14 +1,14 @@
 // All packages except `@mantine/hooks` require styles imports
-import "@mantine/core/styles.css";
-import "@mantine/charts/styles.css";
-import "./styles/globals.css";
+import "@mantine/core/styles.css"
+import "@mantine/charts/styles.css"
+import "./styles/globals.css"
 
-import { MantineProvider } from "@mantine/core";
-import { Container } from "@mantine/core";
+import { MantineProvider } from "@mantine/core"
+import { Container } from "@mantine/core"
 
-import { Nav } from "./components/simple-nav";
-import { UserDataProvider } from "./contexts/user-context";
-import { Routes } from "./routes";
+import { Nav } from "./components/simple-nav"
+import { UserDataProvider } from "./contexts/user-context"
+import { Routes } from "./routes"
 
 export default function App() {
   return (
@@ -17,7 +17,7 @@ export default function App() {
         <BasicAppShell />
       </UserDataProvider>
     </MantineProvider>
-  );
+  )
 }
 
 export function BasicAppShell() {
@@ -26,5 +26,5 @@ export function BasicAppShell() {
       <Nav />
       <Routes />
     </Container>
-  );
+  )
 }
