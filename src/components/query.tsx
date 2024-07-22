@@ -90,7 +90,7 @@ export function Query() {
         throw new Error(`${response.status} on ${response.url}`);
       }
       return response.json();
-    },
+    }
   );
 
   let title = "Query";
@@ -113,6 +113,7 @@ export function Query() {
         resize="both"
         autosize
         minRows={4}
+        maxRows={30}
         autoFocus
         required
         // size="xl"

@@ -4,9 +4,10 @@ import "@mantine/charts/styles.css";
 import "./styles/globals.css";
 
 import { MantineProvider } from "@mantine/core";
-import { Container, Text } from "@mantine/core";
+import { Container } from "@mantine/core";
 
-import { UserDataProvider, useUserData } from "./contexts/user-context";
+import { Nav } from "./components/simple-nav";
+import { UserDataProvider } from "./contexts/user-context";
 import { Routes } from "./routes";
 
 export default function App() {
@@ -20,12 +21,9 @@ export default function App() {
 }
 
 export function BasicAppShell() {
-  const { userData } = useUserData();
   return (
     <Container fluid size="xl">
-      <Text ta="right">
-        {userData?.user ? userData?.user.username : "Anonymous"}
-      </Text>
+      <Nav />
       <Routes />
     </Container>
   );
