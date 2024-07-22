@@ -1,10 +1,10 @@
-import { lazy, Suspense } from "react";
-import { Route, Router, Switch } from "wouter";
+import { lazy, Suspense } from "react"
+import { Route, Router, Switch } from "wouter"
 
-import { Custom404 } from "./components/404";
-import { Home } from "./components/home";
+import { Custom404 } from "./components/404"
+import { Home } from "./components/home"
 
-type LazyComponentT = React.LazyExoticComponent<() => JSX.Element>;
+type LazyComponentT = React.LazyExoticComponent<() => JSX.Element>
 
 function LC(Component: LazyComponentT, loadingText = "Loading") {
   return () => {
@@ -12,11 +12,11 @@ function LC(Component: LazyComponentT, loadingText = "Loading") {
       <Suspense fallback={<p>{loadingText}</p>}>
         <Component />
       </Suspense>
-    );
-  };
+    )
+  }
 }
 
-const Charts = LC(lazy(() => import("./components/charts")));
+const Charts = LC(lazy(() => import("./components/charts")))
 
 export function Routes() {
   return (
@@ -30,5 +30,5 @@ export function Routes() {
         </Route>
       </Switch>
     </Router>
-  );
+  )
 }

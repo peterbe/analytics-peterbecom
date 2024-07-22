@@ -1,10 +1,10 @@
-import { Grid, Text } from "@mantine/core";
-import { Link } from "wouter";
+import { Grid, Text } from "@mantine/core"
+import { Link } from "wouter"
 
-import { useUserData } from "../contexts/user-context";
+import { useUserData } from "../contexts/user-context"
 
 export function Nav() {
-  const { userData } = useUserData();
+  const { userData } = useUserData()
 
   return (
     <Grid>
@@ -18,5 +18,5 @@ export function Nav() {
         </Text>
       </Grid.Col>
     </Grid>
-  );
+  )
 }

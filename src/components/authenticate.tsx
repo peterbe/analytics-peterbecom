@@ -1,12 +1,12 @@
-import { Alert, Container, Paper } from "@mantine/core";
-import { useDocumentTitle } from "@mantine/hooks";
-import { useLocation } from "wouter";
+import { Alert, Container, Paper } from "@mantine/core"
+import { useDocumentTitle } from "@mantine/hooks"
+import { useLocation } from "wouter"
 
-import { useUserData } from "../contexts/user-context";
+import { useUserData } from "../contexts/user-context"
 
 export function Authenticate() {
-  useDocumentTitle("Sign in");
-  const { userData } = useUserData();
+  useDocumentTitle("Sign in")
+  const { userData } = useUserData()
 
   return (
     <Container size={420} my={40}>
@@ -18,15 +18,15 @@ export function Authenticate() {
 
       <SignIn />
     </Container>
-  );
+  )
 }
 
 function SignIn() {
-  const [next] = useLocation();
-  const sp = new URLSearchParams({ next });
+  const [next] = useLocation()
+  const sp = new URLSearchParams({ next })
   return (
     <Paper withBorder shadow="md" p={30} mt={30} radius="md">
       <a href={`/oidc/authenticate/?${sp}`}>Sign in with OpenID Connect</a>
     </Paper>
-  );
+  )
 }

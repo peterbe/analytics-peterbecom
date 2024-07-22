@@ -1,13 +1,13 @@
-import { Alert, Button, LoadingOverlay } from "@mantine/core";
-import type { ReactNode } from "react";
+import { Alert, Button, LoadingOverlay } from "@mantine/core"
+import type { ReactNode } from "react"
 
-import { useUserData } from "../contexts/user-context";
-import { Authenticate } from "./authenticate";
+import { useUserData } from "../contexts/user-context"
+import { Authenticate } from "./authenticate"
 
 export function SignedIn({ children }: { children: ReactNode }) {
   // const { push, asPath } = useRouter()
   // const [location, setLocation] = useLocation()
-  const { userData, userError } = useUserData();
+  const { userData, userError } = useUserData()
 
   // const isNotSignedIn = userData && !userData.user
   // useEffect(() => {
@@ -35,21 +35,21 @@ export function SignedIn({ children }: { children: ReactNode }) {
             variant="outline"
             color="red"
             onClick={() => {
-              window.location.reload();
+              window.location.reload()
             }}
           >
             Try reloading
           </Button>
         </Alert>
       </div>
-    );
+    )
   }
   if (!userData) {
-    return <LoadingOverlay visible={true} />;
+    return <LoadingOverlay visible={true} />
   }
   if (!userData.user) {
-    return <Authenticate />;
+    return <Authenticate />
     // return null
   }
-  return <div>{children}</div>;
+  return <div>{children}</div>
 }
