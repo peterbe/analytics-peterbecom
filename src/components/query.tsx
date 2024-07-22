@@ -113,6 +113,7 @@ export function Query() {
         resize="both"
         autosize
         minRows={4}
+        maxRows={30}
         autoFocus
         required
         // size="xl"
