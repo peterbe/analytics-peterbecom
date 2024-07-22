@@ -1,4 +1,4 @@
-import { Grid,Text } from "@mantine/core";
+import { Grid, Text } from "@mantine/core";
 import { Link } from "wouter";
 
 import { useUserData } from "../contexts/user-context";
