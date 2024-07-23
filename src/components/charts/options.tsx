@@ -7,6 +7,11 @@ export function IntervalOptions({
   value: string
   onChange: (value: string) => void
 }) {
+  const days = [3, 7, 28]
+  if (new Date(2024, 9, 0) < new Date()) {
+    days.push(90)
+  }
+  const options = days.map((d) => ({ label: `${d} days`, value: `${d}` }))
   return (
     <Box>
       <Text>Last...</Text>
@@ -16,11 +21,7 @@ export function IntervalOptions({
         withItemsBorders={false}
         transitionDuration={300}
         transitionTimingFunction="linear"
-        data={[
-          { label: "3 days", value: "3" },
-          { label: "7 days", value: "7" },
-          { label: "28 days", value: "28" },
-        ]}
+        data={options}
       />
     </Box>
   )
