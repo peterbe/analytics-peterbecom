@@ -1,12 +1,12 @@
 import { Box, Title } from "@mantine/core"
 
 import { ChartContainer } from "./container"
+import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
+import { Loading } from "./loading"
+import { IntervalOptions } from "./options"
 import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
 import { addDays } from "./utils"
-import { Loading } from "./loading"
-import { IntervalOptions } from "./options"
-import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 
 const sqlQuery = (days = 7) => `
 SELECT
