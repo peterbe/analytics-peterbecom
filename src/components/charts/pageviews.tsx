@@ -1,14 +1,15 @@
-import { Box, Title } from "@mantine/core"
+import { Box, Grid, Table, Title } from "@mantine/core"
+import { useState } from "react"
 
 import { ChartContainer } from "./container"
 import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
-import { IntervalOptions } from "./options"
+import { IntervalOptions, UrlFilterOptions } from "./options"
 import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
 import { addDays } from "./utils"
 
-const sqlQuery = (days = 7) => `
+const sqlQuery = (days = 7, urlFilter = "") => `
 SELECT
     DATE_TRUNC('day', created) AS day,
     COUNT(url) AS count
@@ -16,13 +17,15 @@ FROM
     analytics
 WHERE
     type='pageview'
-    and created > now() - interval '${days} days'
+    and created > now() - interval '${days + 1} days'
+    and created < DATE_TRUNC('day', now() - interval '1 day')
+    ${urlFilterToSQL(urlFilter)}
 GROUP BY
     day
 ORDER BY
     day;
 `
-const sqlQueryPrevious = (days = 7) => `
+const sqlQueryPrevious = (days = 7, urlFilter = "") => `
 SELECT
     DATE_TRUNC('day', created) AS day,
     COUNT(url) AS count
@@ -30,18 +33,46 @@ FROM
     analytics
 WHERE
     type='pageview'
-    and created < now() - interval '${days} days'
-    and created > now() - interval '${days + days} days'
+    and created < now() - interval '${days + 1} days'
+    and created > now() - interval '${days + days + 1} days'
+    ${urlFilterToSQL(urlFilter)}
 GROUP BY
     day
 ORDER BY
     day;
 `
+const urlFilterToSQL = (urlFilter: string) => {
+  if (!urlFilter) {
+    return ""
+  }
+  if (urlFilter === "lyrics-post") {
+    return `
+    AND (
+      data->>'pathname' LIKE '/plog/blogitem-040601-1/p%' OR
+      data->>'pathname' = '/plog/blogitem-040601-1'
+    )
+      `.trim()
+  }
+  if (urlFilter === "lyrics-search") {
+    return `
+    AND data->>'pathname' LIKE '/plog/blogitem-040601-1/q/%'
+      `.trim()
+  }
+  if (urlFilter === "lyrics-song") {
+    return `
+    AND data->>'pathname' LIKE '/plog/blogitem-040601-1/song/%'
+      `.trim()
+  }
+
+  throw new Error(`Unknown urlFilter: ${urlFilter}`)
+}
+
 export function Pageviews() {
   const [intervalDays, setIntervalDays] = useInterval("pageviews")
+  const [urlFilter, setURLField] = useState("")
 
-  const current = useQuery(sqlQuery(Number(intervalDays)))
-  const previous = useQuery(sqlQueryPrevious(Number(intervalDays)))
+  const current = useQuery(sqlQuery(Number(intervalDays), urlFilter))
+  const previous = useQuery(sqlQueryPrevious(Number(intervalDays), urlFilter))
 
   const dataX: DataRow[] = []
   const series: DataSerie[] = [{ name: "count", label: "Number of pageviews" }]
@@ -86,7 +117,7 @@ export function Pageviews() {
   return (
     <ChartContainer>
       <Title order={3}>Pageviews</Title>
-      <Box pos="relative" mt={25} mb={30}>
+      <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
         {!current.error && (
@@ -94,7 +125,85 @@ export function Pageviews() {
         )}
       </Box>
 
-      <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
+      <Grid>
+        <Grid.Col span={6}>
+          <IntervalOptions value={intervalDays} onChange={setIntervalDays} />
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <UrlFilterOptions value={urlFilter} onChange={setURLField} />
+        </Grid.Col>
+      </Grid>
+
+      <DataRowTable data={dataX} />
     </ChartContainer>
+  )
+}
+
+function DataRowTable({ data }: { data: DataRow[] }) {
+  let sumDelta = <i>n/a</i>
+  if (data.map((x) => x.countPrevious).every((x) => typeof x === "number")) {
+    const sumPrevious = data
+      .map((x) => x.countPrevious || 0)
+      .reduce((x, a) => (x || 0) + (a || 0), 0)
+    const sum = data.map((x) => x.count).reduce((x, a) => x + a, 0)
+    const diff = sum - sumPrevious
+    const sign = diff > 0 ? "+" : ""
+    const pct = sumPrevious === 0 ? 0 : (diff / sumPrevious) * 100
+    sumDelta = (
+      <span style={{ color: diff > 0 ? "green" : "#f68787" }}>
+        {sign}
+        {diff.toLocaleString()} ({sign}
+        {pct.toFixed(1)}%)
+      </span>
+    )
+  }
+
+  return (
+    <Table mt={40} mb={20}>
+      <Table.Thead>
+        <Table.Tr>
+          <Table.Th>Date</Table.Th>
+          <Table.Th>Count</Table.Th>
+          <Table.Th>Previous period</Table.Th>
+        </Table.Tr>
+      </Table.Thead>
+      <Table.Tbody>
+        {data.map((row) => {
+          let delta = <i>n/a</i>
+          if (row.countPrevious) {
+            const diff = row.count - row.countPrevious
+            const sign = diff > 0 ? "+" : ""
+            const pct =
+              row.countPrevious === 0 ? 0 : (diff / row.countPrevious) * 100
+            delta = (
+              <span style={{ color: diff > 0 ? "green" : "#f68787" }}>
+                {sign}
+                {diff.toLocaleString()} ({sign}
+                {pct.toFixed(1)}%)
+              </span>
+            )
+          }
+          return (
+            <Table.Tr key={row.date}>
+              <Table.Td>{row.date}</Table.Td>
+              <Table.Td>{row.count.toLocaleString()}</Table.Td>
+              <Table.Td>{delta}</Table.Td>
+            </Table.Tr>
+          )
+        })}
+      </Table.Tbody>
+      <Table.Tfoot>
+        <Table.Tr>
+          <Table.Th>Sum total</Table.Th>
+          <Table.Th>
+            {data
+              .map((x) => x.count)
+              .reduce((partialSum, a) => partialSum + a, 0)
+              .toLocaleString()}
+          </Table.Th>
+          <Table.Th>{sumDelta}</Table.Th>
+        </Table.Tr>
+      </Table.Tfoot>
+    </Table>
   )
 }

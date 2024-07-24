@@ -26,3 +26,35 @@ export function IntervalOptions({
     </Box>
   )
 }
+
+export function UrlFilterOptions({
+  value,
+  onChange,
+}: {
+  value: string
+  onChange: (value: string) => void
+}) {
+  const values = {
+    "": "Any page",
+    "lyrics-post": "Lyrics post",
+    "lyrics-search": "Lyrics searches",
+    "lyrics-song": "Lyrics songs",
+  }
+  const options = Object.entries(values).map(([value, label]) => ({
+    label,
+    value,
+  }))
+  return (
+    <Box>
+      <Text>Filter...</Text>
+      <SegmentedControl
+        value={value}
+        onChange={onChange}
+        withItemsBorders={false}
+        transitionDuration={300}
+        transitionTimingFunction="linear"
+        data={options}
+      />
+    </Box>
+  )
+}
