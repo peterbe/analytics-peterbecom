@@ -9,16 +9,19 @@ export type DataSerie = {
   name: string
   label: string
   strokeDasharray?: string
+  color?: string
 }
 
 export function BasicLineChart({
   data,
   series,
   dataKey,
+  curveType = "natural",
 }: {
   data: DataRow[]
   series: DataSerie[]
   dataKey: string
+  curveType?: "natural" | "linear" | "monotone"
 }) {
   return (
     <LineChart
@@ -36,8 +39,8 @@ export function BasicLineChart({
         { offset: 100, color: "blue.5" },
       ]}
       strokeWidth={3}
-      curveType="natural"
-      valueFormatter={(value) => value.toLocaleString()}
+      curveType={curveType}
+      valueFormatter={(value) => new Intl.NumberFormat("en-US").format(value)}
     />
   )
 }
