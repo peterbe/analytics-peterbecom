@@ -2,7 +2,7 @@ import { LineChart } from "@mantine/charts"
 
 export type DataRow = {
   date: string
-  count?: number
+  count: number
   countPrevious?: number
 }
 export type DataSerie = {
