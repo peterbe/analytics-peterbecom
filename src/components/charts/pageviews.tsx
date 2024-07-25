@@ -1,12 +1,13 @@
-import { Box, Grid, Table, Title } from "@mantine/core"
-import { useState } from "react"
+import { Box, Grid, Table } from "@mantine/core"
 
+import { ChartTitle } from "./chart-title"
 import { ChartContainer } from "./container"
 import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
-import { IntervalOptions, UrlFilterOptions } from "./options"
+import { IntervalOptions, UrlFilterOptions, urlFilterToSQL } from "./options"
 import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
+import { useURLFilter } from "./use-url-filter"
 import { addDays } from "./utils"
 
 const sqlQuery = (days = 7, urlFilter = "") => `
@@ -41,35 +42,10 @@ GROUP BY
 ORDER BY
     day;
 `
-const urlFilterToSQL = (urlFilter: string) => {
-  if (!urlFilter) {
-    return ""
-  }
-  if (urlFilter === "lyrics-post") {
-    return `
-    AND (
-      data->>'pathname' LIKE '/plog/blogitem-040601-1/p%' OR
-      data->>'pathname' = '/plog/blogitem-040601-1'
-    )
-      `.trim()
-  }
-  if (urlFilter === "lyrics-search") {
-    return `
-    AND data->>'pathname' LIKE '/plog/blogitem-040601-1/q/%'
-      `.trim()
-  }
-  if (urlFilter === "lyrics-song") {
-    return `
-    AND data->>'pathname' LIKE '/plog/blogitem-040601-1/song/%'
-      `.trim()
-  }
-
-  throw new Error(`Unknown urlFilter: ${urlFilter}`)
-}
 
 export function Pageviews() {
   const [intervalDays, setIntervalDays] = useInterval("pageviews")
-  const [urlFilter, setURLField] = useState("")
+  const [urlFilter, setURLField] = useURLFilter("pageviews", "")
 
   const current = useQuery(sqlQuery(Number(intervalDays), urlFilter))
   const previous = useQuery(sqlQueryPrevious(Number(intervalDays), urlFilter))
@@ -115,8 +91,8 @@ export function Pageviews() {
   }
 
   return (
-    <ChartContainer>
-      <Title order={3}>Pageviews</Title>
+    <ChartContainer id="pageviews">
+      <ChartTitle id="pageviews" text="Pageviews" />
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
