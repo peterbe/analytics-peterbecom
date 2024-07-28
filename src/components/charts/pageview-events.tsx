@@ -1,7 +1,6 @@
 import { Box, Grid, Table, Text } from "@mantine/core"
 
 import type { QueryResultRow } from "../../types"
-import { ChartTitle } from "./chart-title"
 import { ChartContainer } from "./container"
 import { Loading } from "./loading"
 import {
@@ -53,8 +52,7 @@ export function PageviewEvents() {
   )
 
   return (
-    <ChartContainer id="pageview-events">
-      <ChartTitle id="pageview-events" text="Pageview Events" />
+    <ChartContainer id="pageview-events" title="Pageview Events">
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 

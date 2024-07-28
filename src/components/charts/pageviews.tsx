@@ -1,6 +1,5 @@
 import { Box, Grid, Table } from "@mantine/core"
 
-import { ChartTitle } from "./chart-title"
 import { ChartContainer } from "./container"
 import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
@@ -91,8 +90,7 @@ export function Pageviews() {
   }
 
   return (
-    <ChartContainer id="pageviews">
-      <ChartTitle id="pageviews" text="Pageviews" />
+    <ChartContainer id="pageviews" title="Pageviews">
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 

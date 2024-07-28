@@ -2,7 +2,6 @@ import { BarChart } from "@mantine/charts"
 import { Box, Grid, SegmentedControl } from "@mantine/core"
 import { useState } from "react"
 
-import { ChartTitle } from "./chart-title"
 import { ChartContainer } from "./container"
 import { type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
@@ -63,8 +62,7 @@ export function LyricsFeatureflag() {
   }
 
   return (
-    <ChartContainer id="lyrics-featureflag">
-      <ChartTitle id="lyrics-featureflag" text="Lyrics Featureflag" />
+    <ChartContainer id="lyrics-featureflag" title="Lyrics Featureflag">
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
