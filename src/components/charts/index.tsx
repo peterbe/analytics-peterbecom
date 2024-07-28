@@ -5,6 +5,7 @@ import { LyricsFeatureflag } from "./lyrics-featureflag"
 import { MinimizeContext } from "./minimize-context"
 import { PageviewEvents } from "./pageview-events"
 import { Pageviews } from "./pageviews"
+import { RenderingPerformance } from "./rendering-performance"
 import { useMinimized } from "./use-minimized"
 
 export default function Charts() {
@@ -17,6 +18,7 @@ export default function Charts() {
         <Pageviews />
         <LyricsFeatureflag />
         <PageviewEvents />
+        <RenderingPerformance />
       </MinimizeContext.Provider>
     </SignedIn>
   )

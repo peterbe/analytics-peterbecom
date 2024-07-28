@@ -1,8 +1,7 @@
 import { useLocalStorage } from "@mantine/hooks"
-import { useEffect } from "react"
 
 export function useMinimized(): [string[], (id: string) => void] {
-  const [minimized, setMinimized, removeMinimized] = useLocalStorage<string[]>({
+  const [minimized, setMinimized] = useLocalStorage<string[]>({
     key: "analytics-minimized-charts",
     defaultValue: [],
     serialize: (value) => {
@@ -23,12 +22,6 @@ export function useMinimized(): [string[], (id: string) => void] {
       }
     })
   }
-
-  useEffect(() => {
-    if (minimized.length === 0) {
-      removeMinimized()
-    }
-  }, [minimized, removeMinimized])
 
   return [minimized, toggleMinimized]
 }
