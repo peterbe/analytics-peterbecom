@@ -1,13 +1,13 @@
 import { useDocumentTitle } from "@mantine/hooks"
 
 import { SignedIn } from "../signed-in"
+import { GeoLocations } from "./geo-locations"
 import { LyricsFeatureflag } from "./lyrics-featureflag"
 import { MinimizeContext } from "./minimize-context"
 import { PageviewEvents } from "./pageview-events"
 import { Pageviews } from "./pageviews"
 import { RenderingPerformance } from "./rendering-performance"
 import { useMinimized } from "./use-minimized"
-import { GeoLocations } from "./geo-locations"
 
 export default function Charts() {
   useDocumentTitle("Charts")

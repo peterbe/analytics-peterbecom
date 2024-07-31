@@ -1,15 +1,14 @@
 import { PieChart } from "@mantine/charts"
-
-import { Grid, Box, Table } from "@mantine/core"
+import { Box, Grid, Table } from "@mantine/core"
 
 import { type QueryResultRow } from "../../types"
+import { DisplayError, DisplayWarning } from "./alerts"
 import { ChartContainer } from "./container"
 import { Loading } from "./loading"
-import { useQuery } from "./use-query"
-import { DisplayError, DisplayWarning } from "./alerts"
-import { useInterval } from "./use-interval"
-import { useRows } from "./use-rows"
 import { IntervalOptions, RowsOptions } from "./options"
+import { useInterval } from "./use-interval"
+import { useQuery } from "./use-query"
+import { useRows } from "./use-rows"
 
 const sqlQuery = ({ limit = 200, days = 30 } = {}) => `
 SELECT city, country, COUNT(*)
