@@ -7,6 +7,7 @@ import { PageviewEvents } from "./pageview-events"
 import { Pageviews } from "./pageviews"
 import { RenderingPerformance } from "./rendering-performance"
 import { useMinimized } from "./use-minimized"
+import { GeoLocations } from "./geo-locations"
 
 export default function Charts() {
   useDocumentTitle("Charts")
@@ -19,6 +20,7 @@ export default function Charts() {
         <LyricsFeatureflag />
         <PageviewEvents />
         <RenderingPerformance />
+        <GeoLocations />
       </MinimizeContext.Provider>
     </SignedIn>
   )
