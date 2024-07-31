@@ -1,6 +1,7 @@
 import { useDocumentTitle } from "@mantine/hooks"
 
 import { SignedIn } from "../signed-in"
+import { GeoLocations } from "./geo-locations"
 import { LyricsFeatureflag } from "./lyrics-featureflag"
 import { MinimizeContext } from "./minimize-context"
 import { PageviewEvents } from "./pageview-events"
@@ -19,6 +20,7 @@ export default function Charts() {
         <LyricsFeatureflag />
         <PageviewEvents />
         <RenderingPerformance />
+        <GeoLocations />
       </MinimizeContext.Provider>
     </SignedIn>
   )
