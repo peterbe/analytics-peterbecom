@@ -9,6 +9,14 @@ import { useQuery } from "./use-query"
 import { useURLFilter } from "./use-url-filter"
 import { addDays } from "./utils"
 
+export function Pageviews() {
+  return (
+    <ChartContainer id="pageviews" title="Pageviews">
+      <Inner />
+    </ChartContainer>
+  )
+}
+
 const sqlQuery = (days = 7, urlFilter = "") => `
 SELECT
     DATE_TRUNC('day', created) AS day,
@@ -42,7 +50,7 @@ ORDER BY
     day;
 `
 
-export function Pageviews() {
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval("pageviews")
   const [urlFilter, setURLField] = useURLFilter("pageviews", "")
 
@@ -63,6 +71,9 @@ export function Pageviews() {
     }
   }
   if (previous.data) {
+    // current.data && console.log("CURRENT", current.data.rows)
+    // console.log("PREVIUOS", previous.data.rows)
+
     for (const row of previous.data.rows) {
       const d = addDays(new Date(row.day as string), Number(intervalDays))
       const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
@@ -90,7 +101,7 @@ export function Pageviews() {
   }
 
   return (
-    <ChartContainer id="pageviews" title="Pageviews">
+    <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
@@ -109,7 +120,7 @@ export function Pageviews() {
       </Grid>
 
       <DataRowTable data={dataX} />
-    </ChartContainer>
+    </>
   )
 }
 

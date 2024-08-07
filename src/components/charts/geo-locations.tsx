@@ -10,6 +10,14 @@ import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
 import { useRows } from "./use-rows"
 
+export function GeoLocations() {
+  return (
+    <ChartContainer id="geo-locations" title="Geo Locations">
+      <Inner />
+    </ChartContainer>
+  )
+}
+
 const sqlQuery = ({ limit = 200, days = 30 } = {}) => `
 SELECT city, country, COUNT(*)
 FROM analytics_geo
@@ -33,7 +41,7 @@ ORDER BY 2 DESC
 LIMIT ${Number(limit)}
 `
 
-export function GeoLocations() {
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval("geo-locations")
   const [rows, setRows] = useRows("geo-locations", 10)
 
@@ -46,7 +54,7 @@ export function GeoLocations() {
   )
 
   return (
-    <ChartContainer id="geo-locations" title="Geo Locations">
+    <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
@@ -67,7 +75,7 @@ export function GeoLocations() {
       </Grid>
 
       <DisplayError error={current.error || countries.error} />
-    </ChartContainer>
+    </>
   )
 }
 

@@ -17,6 +17,14 @@ import { ChartContainer } from "./container"
 import { Loading } from "./loading"
 import { useQuery } from "./use-query"
 
+export function RenderingPerformance() {
+  return (
+    <ChartContainer id="rendering-performance" title="Rendering Performance">
+      <Inner />
+    </ChartContainer>
+  )
+}
+
 const sqlQuery = ({ limit = 200, filter = "", exclude = false } = {}) => `
 SELECT
     url,
@@ -29,7 +37,8 @@ WHERE
 ORDER BY created desc
 LIMIT ${Number(limit)}
 `
-export function RenderingPerformance() {
+
+function Inner() {
   const [urlFilter, setURLFilter] = useState("")
   const [excludeFilter, setExcludeFilter] = useState(false)
 
@@ -37,7 +46,7 @@ export function RenderingPerformance() {
     sqlQuery({ limit: 200, filter: urlFilter, exclude: excludeFilter }),
   )
   return (
-    <ChartContainer id="rendering-performance" title="Rendering Performance">
+    <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
@@ -55,7 +64,7 @@ export function RenderingPerformance() {
           {current.error.message}
         </Alert>
       )}
-    </ChartContainer>
+    </>
   )
 }
 
