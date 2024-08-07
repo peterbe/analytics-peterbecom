@@ -9,6 +9,14 @@ import { IntervalOptions } from "./options"
 import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
 
+export function LyricsFeatureflag() {
+  return (
+    <ChartContainer id="lyrics-featureflag" title="Lyrics Featureflag">
+      <Inner />
+    </ChartContainer>
+  )
+}
+
 const sqlQuery = (days = 7) => `
 SELECT
     DATE_TRUNC('day', created) AS day,
@@ -25,7 +33,7 @@ GROUP BY
 ORDER BY day
 `
 
-export function LyricsFeatureflag() {
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval("lyrics-featureflag")
   const [percentMode, setPercentMode] = useState("")
 
@@ -62,7 +70,7 @@ export function LyricsFeatureflag() {
   }
 
   return (
-    <ChartContainer id="lyrics-featureflag" title="Lyrics Featureflag">
+    <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
@@ -99,6 +107,6 @@ export function LyricsFeatureflag() {
           />
         </Grid.Col>
       </Grid>
-    </ChartContainer>
+    </>
   )
 }

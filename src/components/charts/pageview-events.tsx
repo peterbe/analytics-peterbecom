@@ -14,6 +14,14 @@ import { useQuery } from "./use-query"
 import { useRows } from "./use-rows"
 import { useURLFilter } from "./use-url-filter"
 
+export function PageviewEvents() {
+  return (
+    <ChartContainer id="pageview-events" title="Pageview Events">
+      <Inner />
+    </ChartContainer>
+  )
+}
+
 const sqlQuery = (days = 7, limit = 10, urlFilter = "", previous = false) => `
 SELECT
     url,
@@ -38,7 +46,7 @@ ORDER BY 2 DESC
 LIMIT ${Number(limit)}
 `
 
-export function PageviewEvents() {
+function Inner() {
   const [intervalDays, setIntervalDays] = useInterval("pageview-events")
   const [rows, setRows] = useRows("pageview-events", 10)
   const [urlFilter, setURLField] = useURLFilter("pageview-events", "")
@@ -52,7 +60,7 @@ export function PageviewEvents() {
   )
 
   return (
-    <ChartContainer id="pageview-events" title="Pageview Events">
+    <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={current.isLoading} />
 
@@ -75,7 +83,7 @@ export function PageviewEvents() {
           <UrlFilterOptions value={urlFilter} onChange={setURLField} />
         </Grid.Col>
       </Grid>
-    </ChartContainer>
+    </>
   )
 }
 
