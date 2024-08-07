@@ -71,9 +71,6 @@ function Inner() {
     }
   }
   if (previous.data) {
-    // current.data && console.log("CURRENT", current.data.rows)
-    // console.log("PREVIUOS", previous.data.rows)
-
     for (const row of previous.data.rows) {
       const d = addDays(new Date(row.day as string), Number(intervalDays))
       const k = `${d.toLocaleString("en-US", { month: "short" })} ${d.getDate()}`
