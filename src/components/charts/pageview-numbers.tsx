@@ -23,6 +23,17 @@ WHERE
     type='pageview'
     and ${createdRange(days, back)}
 `
+
+const sqlQueryUsers = (days = 0, back = 0) => `
+SELECT
+    COUNT(DISTINCT meta->'sid') as sessions,
+    COUNT(DISTINCT meta->'uuid') as users
+FROM analytics
+WHERE
+  type='pageview'
+  and ${createdRange(days, back)}
+`
+
 function createdRange(days: number, back: number) {
   const ranges: string[] = []
   ranges.push(`created > now() - interval '${days} days'`)
@@ -33,6 +44,16 @@ function createdRange(days: number, back: number) {
 }
 
 function Inner() {
+  const oldestPageviewCreated = useQuery(`
+    select min(created) from analytics where type='pageview' `)
+  const oldestCreated =
+    (oldestPageviewCreated.data && oldestPageviewCreated.data.rows[0]?.min) ||
+    new Date()
+  const oldestDays = Math.floor(
+    (new Date().getTime() - new Date(oldestCreated).getTime()) /
+      (1000 * 60 * 60 * 24),
+  )
+
   const today = useQuery(sqlQuery(1))
   const yesterday = useQuery(sqlQuery(2, 1))
 
@@ -40,14 +61,17 @@ function Inner() {
   const lastWeek = useQuery(sqlQuery(14, 7))
 
   const thisMonth = useQuery(sqlQuery(28))
-  const lastMonth = useQuery(sqlQuery(52, 28))
+  const lastMonth = useQuery(sqlQuery(28 * 2, 28))
+
+  const usersToday = useQuery(sqlQueryUsers(1))
+  const usersYesterday = useQuery(sqlQueryUsers(2, 1))
 
   return (
     <>
       <Box pos="relative" mt={25} mb={50}>
         <Loading visible={today.isLoading && yesterday.isLoading} />
 
-        <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }}>
+        <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} mb={10}>
           {today.data && yesterday.data && (
             <GridItem
               value={today.data.rows[0]?.count as number}
@@ -78,11 +102,37 @@ function Inner() {
               title="Pageviews this month"
               note="Last 28 days"
               diffPercentage={
-                lastMonth.data.rows[0]?.count
+                lastMonth.data.rows[0]?.count && oldestDays > 28 * 2
                   ? (100 * (thisMonth.data.rows[0]?.count as number)) /
                       (lastMonth.data.rows[0]?.count as number) -
                     100
                   : undefined
+              }
+            />
+          )}
+        </SimpleGrid>
+        <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }}>
+          {usersToday.data && usersYesterday.data && (
+            <GridItem
+              value={usersToday.data.rows[0]?.users as number}
+              title="Users today"
+              note="Last 24 hours"
+              diffPercentage={
+                (100 * (usersToday.data.rows[0]?.users as number)) /
+                  (usersYesterday.data.rows[0]?.users as number) -
+                100
+              }
+            />
+          )}
+          {usersToday.data && usersYesterday.data && (
+            <GridItem
+              value={usersToday.data.rows[0]?.sessions as number}
+              title="Sessions today"
+              note="Last 24 hours"
+              diffPercentage={
+                (100 * (usersToday.data.rows[0]?.sessions as number)) /
+                  (usersYesterday.data.rows[0]?.sessions as number) -
+                100
               }
             />
           )}
