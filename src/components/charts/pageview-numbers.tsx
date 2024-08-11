@@ -46,10 +46,10 @@ function createdRange(days: number, back: number) {
 function Inner() {
   const oldestPageviewCreated = useQuery(`
     select min(created) from analytics where type='pageview' `)
-  let oldestCreated =
+  const oldestCreated =
     (oldestPageviewCreated.data && oldestPageviewCreated.data.rows[0]?.min) ||
     new Date()
-  let oldestDays = Math.floor(
+  const oldestDays = Math.floor(
     (new Date().getTime() - new Date(oldestCreated).getTime()) /
       (1000 * 60 * 60 * 24),
   )
