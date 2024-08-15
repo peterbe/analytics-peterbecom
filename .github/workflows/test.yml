@@ -41,3 +41,15 @@ jobs:
 
       - name: Build (and lint)
         run: npm run build
+
+      - name: Serve app
+        env:
+          PORT: 3000
+        run: |
+
+          npm run serve &
+          sleep 1
+          curl --fail --retry-connrefused --retry 3 localhost:3000
+
+      - name: Test manifest
+        run: npm run test-manifest
