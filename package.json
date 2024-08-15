@@ -9,10 +9,12 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "lint:fix": "eslint . --ext ts,tsx --report-unused-disable-directives --fix",
     "preview": "vite preview",
-    "pretty": "prettier --check src *.cjs package.json",
-    "pretty:fix": "prettier --write src *.cjs package.json",
+    "pretty": "prettier --check src script *.cjs package.json",
+    "pretty:fix": "prettier --write src script *.cjs package.json",
     "prepare": "husky",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "serve": "serve dist",
+    "test-manifest": "node script/test-manifest.mjs"
   },
   "dependencies": {
     "@mantine/charts": "7.12.1",
@@ -38,6 +40,7 @@
     "postcss-preset-mantine": "1.17.0",
     "postcss-simple-vars": "7.0.1",
     "prettier": "3.3.3",
+    "serve": "^14.2.3",
     "typescript": "^5.5.4",
     "vite": "^5.4.0"
   }
