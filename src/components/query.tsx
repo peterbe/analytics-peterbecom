@@ -18,7 +18,7 @@ import { Link, useLocation, useSearch } from "wouter"
 import type { QueryResult, QueryResultRow, QueryResultRowValue } from "../types"
 import { ChartData } from "./chart-data"
 
-export function Query() {
+export default function Query() {
   const [value, setValue] = useLocalStorage({
     key: "saved-queries",
     defaultValue: "",

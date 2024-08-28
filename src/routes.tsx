@@ -17,12 +17,14 @@ function LC(Component: LazyComponentT, loadingText = "Loading") {
 }
 
 const Charts = LC(lazy(() => import("./components/charts")))
+const Query = LC(lazy(() => import("./components/query")))
 
 export function Routes() {
   return (
     <Router>
       <Switch>
         <Route path="/" component={Home} />
+        <Route path="/query" component={Query} />
         <Route path="/charts" component={Charts} />
 
         <Route>

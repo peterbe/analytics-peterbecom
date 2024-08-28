@@ -10,7 +10,7 @@ export function Nav() {
     <Grid>
       <Grid.Col span={8}>
         ANALYTICS - <Link href="/">Home</Link> -{" "}
-        <Link href="/charts">Charts</Link>
+        <Link href="/query">Query</Link> - <Link href="/charts">Charts</Link>
       </Grid.Col>
       <Grid.Col span={4}>
         <Text ta="right">
