@@ -1,6 +1,6 @@
+import { Box, Button, Group } from "@mantine/core"
 import { useDocumentTitle } from "@mantine/hooks"
 import { Link } from "wouter"
-import { Box, Button, Group } from "@mantine/core"
 
 import { SignedIn } from "./signed-in"
 
