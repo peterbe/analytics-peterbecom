@@ -1,18 +1,20 @@
 import {
   Alert,
+  Button,
   Code,
   Container,
   HoverCard,
   Kbd,
   Paper,
+  SimpleGrid,
   Table,
   Text,
   Textarea,
 } from "@mantine/core"
 import { useDocumentTitle, useLocalStorage } from "@mantine/hooks"
+import { useQuery } from "@tanstack/react-query"
 import { memo, useEffect, useRef } from "react"
 import { useState } from "react"
-import useSWR from "swr"
 import { Link, useLocation, useSearch } from "wouter"
 
 import type { QueryResult, QueryResultRow, QueryResultRowValue } from "../types"
@@ -48,7 +50,7 @@ export default function Query() {
         if (textareaRef.current) {
           const extracted = extractActiveQuery(typedQuery, textareaRef.current)
           if (extracted.length <= 1) {
-            console.log({ typedQuery, extracted })
+            // console.log({ typedQuery, extracted })
             throw new Error("Extracting query from position failed")
           }
 
@@ -72,10 +74,11 @@ export default function Query() {
     xhrUrl = "/api/v0/analytics/query?" + sp.toString()
   }
 
-  const { data, error, isLoading } = useSWR<QueryResult, Error>(
-    xhrUrl,
-    async (url: string) => {
-      const response = await fetch(url)
+  const { isPending, error, data, isFetching, refetch } = useQuery({
+    queryKey: ["query", activeQuery],
+    queryFn: async () => {
+      if (!xhrUrl) return Promise.resolve(null)
+      const response = await fetch(xhrUrl)
       if (!response.ok) {
         if (response.status === 400) {
           const json = await response.json()
@@ -87,19 +90,17 @@ export default function Query() {
       }
       return response.json()
     },
-  )
+  })
 
   let title = "Query"
   if (error) {
     title = `Error in query`
-  } else if (isLoading) {
+  } else if (isPending) {
     title = "Loading query..."
   } else if (data) {
     title = `${data.meta.count_rows.toLocaleString()} rows`
   }
   useDocumentTitle(title)
-
-  // function formSubmit() {}
 
   return (
     <div>
@@ -129,17 +130,19 @@ export default function Query() {
         </Text>
       </Container>
 
-      {isLoading && <Alert color="gray">Loading...</Alert>}
+      {isPending && <Alert color="gray">Loading...</Alert>}
       {error && (
         <Alert color={error.message.includes("500") ? "red" : "yellow"}>
           <pre style={{ margin: 0 }}>{error.message}</pre>
         </Alert>
       )}
 
-      {data && <Show data={data} />}
+      {data && (
+        <Show data={data} isFetching={isFetching} refetch={() => refetch()} />
+      )}
 
       {activeQuery && (
-        <Paper>
+        <Paper mt="xl">
           Active query: <Code>{activeQuery}</Code>
         </Paper>
       )}
@@ -167,7 +170,15 @@ function extractActiveQuery(typedQuery: string, textarea: HTMLTextAreaElement) {
   return typedQuery.substring(a, b)
 }
 
-function Show({ data }: { data: QueryResult }) {
+function Show({
+  data,
+  isFetching,
+  refetch,
+}: {
+  data: QueryResult
+  isFetching: boolean
+  refetch: () => void
+}) {
   const search = useSearch()
   const [location] = useLocation()
   const searchParams = new URLSearchParams(search)
@@ -193,17 +204,30 @@ function Show({ data }: { data: QueryResult }) {
           <ChartData name="main" data={data} chart={chart} />
         </Container>
       )}
-      <Text size="sm">
-        Rows: {data.meta.count_rows.toLocaleString()}. Took{" "}
-        <Took seconds={data.meta.took_seconds} />
-        {data.meta.maxed_rows && (
-          <span>
-            {" "}
-            (maxed rows, only showing first{" "}
-            {data.meta.count_rows.toLocaleString()})
-          </span>
-        )}
-      </Text>
+      <SimpleGrid cols={2}>
+        <Text size="sm">
+          Rows: {data.meta.count_rows.toLocaleString()}. Took{" "}
+          <Took seconds={data.meta.took_seconds} />
+          {data.meta.maxed_rows && (
+            <span>
+              {" "}
+              (maxed rows, only showing first{" "}
+              {data.meta.count_rows.toLocaleString()})
+            </span>
+          )}
+        </Text>
+
+        <Button
+          disabled={isFetching}
+          loading={isFetching}
+          loaderProps={{ children: "Refreshing" }}
+          variant="transparent"
+          size="xs"
+          onClick={() => refetch()}
+        >
+          Refresh
+        </Button>
+      </SimpleGrid>
 
       <Rows data={data.rows} />
     </div>

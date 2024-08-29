@@ -8,7 +8,7 @@ build:
     npm run build
 
 start: build
-    npm run preview
+    npm run preview -- --port 3000
 
 pretty:
     npm run pretty
