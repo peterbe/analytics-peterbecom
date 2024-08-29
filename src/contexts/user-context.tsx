@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import type { ReactNode } from "react"
-import { createContext, useContext, useEffect } from "react"
+import { createContext, useEffect } from "react"
 
 import type { User } from "../types"
 
@@ -14,7 +14,7 @@ type UserContext = {
 }
 
 // const UserDataContext = createContext<UserData | null>(null)
-const UserDataContext = createContext<UserContext>({
+export const UserDataContext = createContext<UserContext>({
   userData: null,
   userError: null,
 })
@@ -104,8 +104,4 @@ export function UserDataProvider(props: { children: ReactNode }) {
       {props.children}
     </UserDataContext.Provider>
   )
-}
-
-export function useUserData() {
-  return useContext(UserDataContext)
 }

@@ -2,7 +2,7 @@ import { BarChart } from "@mantine/charts"
 import { Button, Code, Grid } from "@mantine/core"
 import { useLocation, useSearch } from "wouter"
 
-import type { QueryResult } from "../types"
+import type { QueryResult } from "../../types"
 
 export function ChartData({
   name,

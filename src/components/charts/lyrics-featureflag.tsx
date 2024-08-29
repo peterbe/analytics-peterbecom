@@ -3,9 +3,9 @@ import { Box, Grid, SegmentedControl } from "@mantine/core"
 import { useState } from "react"
 
 import { ChartContainer } from "./container"
+import { IntervalOptions } from "./interval-options"
 import { type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
-import { IntervalOptions } from "./options"
 import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
 

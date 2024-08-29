@@ -2,13 +2,11 @@ import { Box, Grid, Table, Text } from "@mantine/core"
 
 import type { QueryResultRow } from "../../types"
 import { ChartContainer } from "./container"
+import { IntervalOptions } from "./interval-options"
 import { Loading } from "./loading"
-import {
-  IntervalOptions,
-  RowsOptions,
-  UrlFilterOptions,
-  urlFilterToSQL,
-} from "./options"
+import { UrlFilterOptions } from "./options"
+import { RowsOptions } from "./rows-options"
+import { urlFilterToSQL } from "./url-filter-to-sql"
 import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
 import { useRows } from "./use-rows"
