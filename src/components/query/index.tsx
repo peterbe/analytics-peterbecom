@@ -71,8 +71,7 @@ export default function Query() {
 
   const { isPending, error, data, isFetching, refetch } = useQuery<QueryResult>(
     {
-      // queryKey: ["query", activeQuery],
-      queryKey: [xhrUrl],
+      queryKey: ["query", activeQuery],
       queryFn: async () => {
         if (!xhrUrl) return null
         const response = await fetch(xhrUrl)
