@@ -12,8 +12,8 @@ import { useQuery } from "@tanstack/react-query"
 import { useEffect, useRef } from "react"
 import { useState } from "react"
 
-import { Show } from "./show"
 import { QueryResult } from "../../types"
+import { Show } from "./show"
 
 export default function Query() {
   const [value, setValue] = useLocalStorage({
@@ -71,7 +71,8 @@ export default function Query() {
 
   const { isPending, error, data, isFetching, refetch } = useQuery<QueryResult>(
     {
-      queryKey: ["query", activeQuery],
+      // queryKey: ["query", activeQuery],
+      queryKey: [xhrUrl],
       queryFn: async () => {
         if (!xhrUrl) return null
         const response = await fetch(xhrUrl)
