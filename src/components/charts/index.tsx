@@ -1,4 +1,7 @@
 import { useDocumentTitle } from "@mantine/hooks"
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister"
+import { QueryClient } from "@tanstack/react-query"
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client"
 
 import { SignedIn } from "../signed-in"
 import { GeoLocations } from "./geo-locations"
@@ -10,20 +13,37 @@ import { Pageviews } from "./pageviews"
 import { RenderingPerformance } from "./rendering-performance"
 import { useMinimized } from "./use-minimized"
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
+    },
+  },
+})
+
+const persister = createSyncStoragePersister({
+  storage: window.localStorage,
+})
+
 export default function Charts() {
   useDocumentTitle("Charts")
 
   const [minimized, toggleMinimized] = useMinimized()
   return (
     <SignedIn>
-      <MinimizeContext.Provider value={{ minimized, toggleMinimized }}>
-        <PageviewNumbers />
-        <Pageviews />
-        <LyricsFeatureflag />
-        <PageviewEvents />
-        <RenderingPerformance />
-        <GeoLocations />
-      </MinimizeContext.Provider>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister }}
+      >
+        <MinimizeContext.Provider value={{ minimized, toggleMinimized }}>
+          <PageviewNumbers />
+          <Pageviews />
+          <LyricsFeatureflag />
+          <PageviewEvents />
+          <RenderingPerformance />
+          <GeoLocations />
+        </MinimizeContext.Provider>
+      </PersistQueryClientProvider>
     </SignedIn>
   )
 }
