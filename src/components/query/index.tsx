@@ -13,6 +13,7 @@ import { useEffect, useRef } from "react"
 import { useState } from "react"
 
 import { Show } from "./show"
+import { QueryResult } from "../../types"
 
 export default function Query() {
   const [value, setValue] = useLocalStorage({
@@ -68,23 +69,25 @@ export default function Query() {
     xhrUrl = "/api/v0/analytics/query?" + sp.toString()
   }
 
-  const { isPending, error, data, isFetching, refetch } = useQuery({
-    queryKey: ["query", activeQuery],
-    queryFn: async () => {
-      if (!xhrUrl) return Promise.resolve(null)
-      const response = await fetch(xhrUrl)
-      if (!response.ok) {
-        if (response.status === 400) {
-          const json = await response.json()
-          if (json.error) {
-            throw new Error(json.error)
+  const { isPending, error, data, isFetching, refetch } = useQuery<QueryResult>(
+    {
+      queryKey: ["query", activeQuery],
+      queryFn: async () => {
+        if (!xhrUrl) return null
+        const response = await fetch(xhrUrl)
+        if (!response.ok) {
+          if (response.status === 400) {
+            const json = await response.json()
+            if (json.error) {
+              throw new Error(json.error)
+            }
           }
+          throw new Error(`${response.status} on ${response.url}`)
         }
-        throw new Error(`${response.status} on ${response.url}`)
-      }
-      return response.json()
+        return response.json()
+      },
     },
-  })
+  )
 
   let title = "Query"
   if (error) {
