@@ -1,6 +1,6 @@
 import { Alert } from "@mantine/core"
 
-export function DisplayError({ error }: { error?: Error }) {
+export function DisplayError({ error }: { error?: Error | null }) {
   if (!error) return null
   return (
     <Alert variant="filled" color="red" title="Error">

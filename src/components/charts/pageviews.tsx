@@ -1,9 +1,11 @@
 import { Box, Grid, Table } from "@mantine/core"
 
 import { ChartContainer } from "./container"
+import { IntervalOptions } from "./interval-options"
 import { BasicLineChart, type DataRow, type DataSerie } from "./line-chart"
 import { Loading } from "./loading"
-import { IntervalOptions, UrlFilterOptions, urlFilterToSQL } from "./options"
+import { UrlFilterOptions } from "./options"
+import { urlFilterToSQL } from "./url-filter-to-sql"
 import { useInterval } from "./use-interval"
 import { useQuery } from "./use-query"
 import { useURLFilter } from "./use-url-filter"

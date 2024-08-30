@@ -13,8 +13,8 @@ export async function fetcher(url: string) {
 }
 
 export const fetchOptions = {
-  revalidateOnFocus: false,
-  refreshInterval: 5 * 60 * 1000,
+  refetchOnWindowFocus: true, // already default actually
+  refetchInterval: 5 * 60 * 1000,
 }
 
 export const apiPrefix = "/api/v0/analytics/query?"

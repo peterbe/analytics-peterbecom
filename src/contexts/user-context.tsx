@@ -1,6 +1,6 @@
+import { useQuery } from "@tanstack/react-query"
 import type { ReactNode } from "react"
-import { createContext, useContext, useEffect } from "react"
-import useSWR from "swr"
+import { createContext, useEffect } from "react"
 
 import type { User } from "../types"
 
@@ -14,7 +14,7 @@ type UserContext = {
 }
 
 // const UserDataContext = createContext<UserData | null>(null)
-const UserDataContext = createContext<UserContext>({
+export const UserDataContext = createContext<UserContext>({
   userData: null,
   userError: null,
 })
@@ -68,10 +68,10 @@ function setSessionStorageData(data: UserData) {
 }
 
 export function UserDataProvider(props: { children: ReactNode }) {
-  const { data, error } = useSWR<UserData | null, Error | null>(
-    "/api/v0/whoami",
-    async (url: string) => {
-      const response = await fetch(url)
+  const { data, error } = useQuery({
+    queryKey: ["whoami"],
+    queryFn: async () => {
+      const response = await fetch("/api/v0/whoami")
       if (!response.ok) {
         removeSessionStorageData()
         throw new Error(`${response.status} on ${response.url}`)
@@ -82,7 +82,7 @@ export function UserDataProvider(props: { children: ReactNode }) {
         user,
       }
     },
-  )
+  })
 
   useEffect(() => {
     if (data) {
@@ -104,8 +104,4 @@ export function UserDataProvider(props: { children: ReactNode }) {
       {props.children}
     </UserDataContext.Provider>
   )
-}
-
-export function useUserData() {
-  return useContext(UserDataContext)
 }

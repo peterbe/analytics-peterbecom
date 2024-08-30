@@ -1,4 +1,4 @@
-import { Box, Group, Paper, SimpleGrid, Text } from "@mantine/core"
+import { Box, Group, Loader, Paper, SimpleGrid, Text } from "@mantine/core"
 
 import { ChartContainer } from "./container"
 import { Loading } from "./loading"
@@ -77,6 +77,7 @@ function Inner() {
               value={today.data.rows[0]?.count as number}
               title="Pageviews today"
               note="Last 24 hours"
+              isFetching={today.isFetching}
               diffPercentage={
                 (100 * (today.data.rows[0]?.count as number)) /
                   (yesterday.data.rows[0]?.count as number) -
@@ -89,6 +90,7 @@ function Inner() {
               value={thisWeek.data.rows[0]?.count as number}
               title="Pageviews this week"
               note="Last 7 days"
+              isFetching={thisWeek.isFetching}
               diffPercentage={
                 (100 * (thisWeek.data.rows[0]?.count as number)) /
                   (lastWeek.data.rows[0]?.count as number) -
@@ -101,6 +103,7 @@ function Inner() {
               value={thisMonth.data.rows[0]?.count as number}
               title="Pageviews this month"
               note="Last 28 days"
+              isFetching={thisMonth.isFetching}
               diffPercentage={
                 lastMonth.data.rows[0]?.count && oldestDays > 28 * 2
                   ? (100 * (thisMonth.data.rows[0]?.count as number)) /
@@ -117,6 +120,7 @@ function Inner() {
               value={usersToday.data.rows[0]?.users as number}
               title="Users today"
               note="Last 24 hours"
+              isFetching={usersToday.isFetching || usersYesterday.isFetching}
               diffPercentage={
                 (100 * (usersToday.data.rows[0]?.users as number)) /
                   (usersYesterday.data.rows[0]?.users as number) -
@@ -129,6 +133,7 @@ function Inner() {
               value={usersToday.data.rows[0]?.sessions as number}
               title="Sessions today"
               note="Last 24 hours"
+              isFetching={usersToday.isFetching || usersYesterday.isFetching}
               diffPercentage={
                 (100 * (usersToday.data.rows[0]?.sessions as number)) /
                   (usersYesterday.data.rows[0]?.sessions as number) -
@@ -165,11 +170,13 @@ function GridItem({
   title,
   note,
   diffPercentage,
+  isFetching,
 }: {
   value: number
   title: string
   note?: string
   diffPercentage?: number
+  isFetching?: boolean
 }) {
   return (
     <Paper withBorder p="md" radius="md">
@@ -191,11 +198,18 @@ function GridItem({
         )}
       </Group>
 
-      {note && (
-        <Text fz="xs" c="dimmed" mt={7}>
-          {note}
-        </Text>
-      )}
+      <SimpleGrid cols={2}>
+        {note && (
+          <Text fz="xs" c="dimmed" mt={7}>
+            {note}
+          </Text>
+        )}
+        {isFetching && (
+          <Text ta="right">
+            <Loader size={12} />
+          </Text>
+        )}
+      </SimpleGrid>
     </Paper>
   )
 }
