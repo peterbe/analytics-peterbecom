@@ -12,9 +12,13 @@ export async function fetcher(url: string) {
   return response.json()
 }
 
-export const fetchOptions = {
+export const refreshingFetchOptions = {
   refetchOnWindowFocus: true, // already default actually
   refetchInterval: 5 * 60 * 1000,
 }
 
+export const notRefreshingFetchOptions = {
+  refetchOnWindowFocus: false,
+  refetchInterval: 15 * 60 * 1000 + Math.random() * 1000,
+}
 export const apiPrefix = "/api/v0/analytics/query?"
