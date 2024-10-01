@@ -54,7 +54,7 @@ function Inner() {
       (1000 * 60 * 60 * 24),
   )
 
-  const today = useQuery(sqlQuery(1))
+  const today = useQuery(sqlQuery(1), { refresh: true })
   const yesterday = useQuery(sqlQuery(2, 1))
 
   const thisWeek = useQuery(sqlQuery(7))
@@ -63,107 +63,87 @@ function Inner() {
   const thisMonth = useQuery(sqlQuery(28))
   const lastMonth = useQuery(sqlQuery(28 * 2, 28))
 
-  const usersToday = useQuery(sqlQueryUsers(1))
+  const usersToday = useQuery(sqlQueryUsers(1), { refresh: true })
   const usersYesterday = useQuery(sqlQueryUsers(2, 1))
 
   return (
-    <>
-      <Box pos="relative" mt={25} mb={50}>
-        <Loading visible={today.isLoading && yesterday.isLoading} />
+    <Box pos="relative" mt={25} mb={50} style={{ minHeight: 260 }}>
+      <Loading visible={today.isLoading && yesterday.isLoading} />
 
-        <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} mb={10}>
-          {today.data && yesterday.data && (
-            <GridItem
-              value={today.data.rows[0]?.count as number}
-              title="Pageviews today"
-              note="Last 24 hours"
-              isFetching={today.isFetching}
-              diffPercentage={
-                (100 * (today.data.rows[0]?.count as number)) /
-                  (yesterday.data.rows[0]?.count as number) -
-                100
-              }
-            />
-          )}
-          {thisWeek.data && lastWeek.data && (
-            <GridItem
-              value={thisWeek.data.rows[0]?.count as number}
-              title="Pageviews this week"
-              note="Last 7 days"
-              isFetching={thisWeek.isFetching}
-              diffPercentage={
-                (100 * (thisWeek.data.rows[0]?.count as number)) /
-                  (lastWeek.data.rows[0]?.count as number) -
-                100
-              }
-            />
-          )}
-          {thisMonth.data && lastMonth.data && (
-            <GridItem
-              value={thisMonth.data.rows[0]?.count as number}
-              title="Pageviews this month"
-              note="Last 28 days"
-              isFetching={thisMonth.isFetching}
-              diffPercentage={
-                lastMonth.data.rows[0]?.count && oldestDays > 28 * 2
-                  ? (100 * (thisMonth.data.rows[0]?.count as number)) /
-                      (lastMonth.data.rows[0]?.count as number) -
-                    100
-                  : undefined
-              }
-            />
-          )}
-        </SimpleGrid>
-        <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }}>
-          {usersToday.data && usersYesterday.data && (
-            <GridItem
-              value={usersToday.data.rows[0]?.users as number}
-              title="Users today"
-              note="Last 24 hours"
-              isFetching={usersToday.isFetching || usersYesterday.isFetching}
-              diffPercentage={
-                (100 * (usersToday.data.rows[0]?.users as number)) /
-                  (usersYesterday.data.rows[0]?.users as number) -
-                100
-              }
-            />
-          )}
-          {usersToday.data && usersYesterday.data && (
-            <GridItem
-              value={usersToday.data.rows[0]?.sessions as number}
-              title="Sessions today"
-              note="Last 24 hours"
-              isFetching={usersToday.isFetching || usersYesterday.isFetching}
-              diffPercentage={
-                (100 * (usersToday.data.rows[0]?.sessions as number)) /
-                  (usersYesterday.data.rows[0]?.sessions as number) -
-                100
-              }
-            />
-          )}
-        </SimpleGrid>
-      </Box>
-    </>
+      <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }} mb={10}>
+        {today.data && yesterday.data && (
+          <GridItem
+            value={today.data.rows[0]?.count as number}
+            title="Pageviews today"
+            note="Last 24 hours"
+            isFetching={today.isFetching}
+            diffPercentage={
+              (100 * (today.data.rows[0]?.count as number)) /
+                (yesterday.data.rows[0]?.count as number) -
+              100
+            }
+          />
+        )}
+        {thisWeek.data && lastWeek.data && (
+          <GridItem
+            value={thisWeek.data.rows[0]?.count as number}
+            title="Pageviews this week"
+            note="Last 7 days"
+            isFetching={thisWeek.isFetching}
+            diffPercentage={
+              (100 * (thisWeek.data.rows[0]?.count as number)) /
+                (lastWeek.data.rows[0]?.count as number) -
+              100
+            }
+          />
+        )}
+        {thisMonth.data && lastMonth.data && (
+          <GridItem
+            value={thisMonth.data.rows[0]?.count as number}
+            title="Pageviews this month"
+            note="Last 28 days"
+            isFetching={thisMonth.isFetching}
+            diffPercentage={
+              lastMonth.data.rows[0]?.count && oldestDays > 28 * 2
+                ? (100 * (thisMonth.data.rows[0]?.count as number)) /
+                    (lastMonth.data.rows[0]?.count as number) -
+                  100
+                : undefined
+            }
+          />
+        )}
+      </SimpleGrid>
+      <SimpleGrid cols={{ base: 1, xs: 2, md: 4 }}>
+        {usersToday.data && usersYesterday.data && (
+          <GridItem
+            value={usersToday.data.rows[0]?.users as number}
+            title="Users today"
+            note="Last 24 hours"
+            isFetching={usersToday.isFetching || usersYesterday.isFetching}
+            diffPercentage={
+              (100 * (usersToday.data.rows[0]?.users as number)) /
+                (usersYesterday.data.rows[0]?.users as number) -
+              100
+            }
+          />
+        )}
+        {usersToday.data && usersYesterday.data && (
+          <GridItem
+            value={usersToday.data.rows[0]?.sessions as number}
+            title="Sessions today"
+            note="Last 24 hours"
+            isFetching={usersToday.isFetching || usersYesterday.isFetching}
+            diffPercentage={
+              (100 * (usersToday.data.rows[0]?.sessions as number)) /
+                (usersYesterday.data.rows[0]?.sessions as number) -
+              100
+            }
+          />
+        )}
+      </SimpleGrid>
+    </Box>
   )
 }
-
-// function hoursSinceMidnightUTC() {
-//   // Get the current date and time in UTC
-//   const now = new Date()
-
-//   // Create a new date object representing midnight of the current day in UTC
-//   const midnightUTC = new Date(
-//     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-//   )
-
-//   // Calculate the difference in milliseconds
-//   const diffInMs = now.getTime() - midnightUTC.getTime()
-
-//   // Convert milliseconds to hours
-//   const hoursSinceMidnight = diffInMs / (1000 * 60 * 60)
-
-//   return hoursSinceMidnight
-// }
 
 function GridItem({
   value,
