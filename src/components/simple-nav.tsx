@@ -1,7 +1,7 @@
 import { Grid, Text } from "@mantine/core"
 import { Link } from "wouter"
 
-import { useUserData } from "../hooks/use-userdata"
+import { useUserData } from "../whoami/use-userdata"
 
 export function Nav() {
   const { userData } = useUserData()
