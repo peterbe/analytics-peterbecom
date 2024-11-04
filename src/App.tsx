@@ -8,8 +8,8 @@ import { Container } from "@mantine/core"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 import { Nav } from "./components/simple-nav"
-import { UserDataProvider } from "./contexts/user-context"
 import { Routes } from "./routes"
+import { UserDataProvider } from "./whoami/provider"
 
 const queryClient = new QueryClient()
 
