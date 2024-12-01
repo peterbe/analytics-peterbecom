@@ -41,7 +41,7 @@
     "postcss": "8.4.49",
     "postcss-preset-mantine": "1.17.0",
     "postcss-simple-vars": "7.0.1",
-    "prettier": "3.3.3",
+    "prettier": "3.4.1",
     "serve": "^14.2.4",
     "typescript": "^5.5.4",
     "vite": "^5.4.11"
