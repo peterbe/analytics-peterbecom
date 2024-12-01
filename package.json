@@ -20,7 +20,7 @@
     "@mantine/charts": "7.14.1",
     "@mantine/core": "7.14.1",
     "@mantine/hooks": "7.14.1",
-    "@tanstack/query-sync-storage-persister": "^5.60.6",
+    "@tanstack/query-sync-storage-persister": "^5.62.0",
     "@tanstack/react-query": "^5.61.0",
     "@tanstack/react-query-persist-client": "^5.61.0",
     "react": "^18.3.1",
