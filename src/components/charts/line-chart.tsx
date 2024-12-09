@@ -40,6 +40,15 @@ export function BasicLineChart({
       ]}
       strokeWidth={3}
       curveType={curveType}
+      tooltipAnimationDuration={200}
+      yAxisProps={{
+        tickFormatter: (value) => {
+          if (value > 1_000) {
+            return `${new Intl.NumberFormat("en-US").format(value / 1000)}k`
+          }
+          return new Intl.NumberFormat("en-US").format(value)
+        },
+      }}
       valueFormatter={(value) => new Intl.NumberFormat("en-US").format(value)}
     />
   )
